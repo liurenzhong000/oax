@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.RechargeMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.Recharge">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="coin_id" jdbcType="INTEGER" property="coinId"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="from_address" jdbcType="VARCHAR" property="fromAddress"/>
+        <result column="to_address" jdbcType="VARCHAR" property="toAddress"/>
+        <result column="qty" jdbcType="DECIMAL" property="qty"/>
+        <result column="tx_id" jdbcType="VARCHAR" property="txId"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, coin_id, type,from_address, to_address, qty, tx_id, remark, create_time,
+        update_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.recharge
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.recharge
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.Recharge">
+        insert into oax.recharge (id, user_id, coin_id,type,
+        from_address, to_address, qty,
+        tx_id, remark, create_time,
+        update_time)
+        values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{coinId,jdbcType=INTEGER},#{type,jdbcType=INTEGER},
+        #{fromAddress,jdbcType=VARCHAR}, #{toAddress,jdbcType=VARCHAR}, #{qty,jdbcType=DECIMAL},
+        #{txId,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.Recharge">
+        insert into oax.recharge
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="fromAddress != null">
+                from_address,
+            </if>
+            <if test="toAddress != null">
+                to_address,
+            </if>
+            <if test="qty != null">
+                qty,
+            </if>
+            <if test="txId != null">
+                tx_id,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="fromAddress != null">
+                #{fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="toAddress != null">
+                #{toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="qty != null">
+                #{qty,jdbcType=DECIMAL},
+            </if>
+            <if test="txId != null">
+                #{txId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.Recharge">
+        update oax.recharge
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                coin_id = #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="fromAddress != null">
+                from_address = #{fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="toAddress != null">
+                to_address = #{toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="qty != null">
+                qty = #{qty,jdbcType=DECIMAL},
+            </if>
+            <if test="txId != null">
+                tx_id = #{txId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.Recharge">
+        update oax.recharge
+        set user_id = #{userId,jdbcType=INTEGER},
+        coin_id = #{coinId,jdbcType=INTEGER},
+            type = #{type,jdbcType=INTEGER},
+        from_address = #{fromAddress,jdbcType=VARCHAR},
+        to_address = #{toAddress,jdbcType=VARCHAR},
+        qty = #{qty,jdbcType=DECIMAL},
+        tx_id = #{txId,jdbcType=VARCHAR},
+        remark = #{remark,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getByUserIdRecharge" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.recharge
+        where user_id = #{userId}
+    </select>
+    <select id="getByUserIdQueryRecharge" resultType="com.oax.entity.admin.vo.RechargesVo">
+        select c.short_name shortName,
+        r.qty, r.from_address, r.to_address, r.create_time
+        from oax.recharge r
+        left join oax.coin c on r.coin_id = c.id
+        left join oax.user u on r.user_id = u.id
+        where r.user_id = #{userId}
+        <if test="coinId != null and coinId != ''">
+            and c.id = #{coinId}
+        </if>
+        <if test="beginTime != null">
+            and r.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and r.create_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <select id="getByUserId" resultType="com.oax.entity.front.RechargeResult">
+        select r.id, c.short_name,c.image,
+        r.qty, r.from_address, r.to_address, r.create_time,r.update_time,r.remark
+        from oax.recharge r
+        left join oax.coin c on r.coin_id = c.id
+        left join oax.user u on r.user_id = u.id
+        where r.user_id = #{userId}
+        <if test="coinName != null and coinName != ''">
+            and c.short_name like concat('%',#{coinName},'%')
+        </if>
+        order by r.create_time desc
+    </select>
+
+    <select id="selectByRechargeParam" resultType="com.oax.entity.admin.vo.RechargePageVo">
+        select
+        rg.id `id`,
+        rg.user_id `userId`,
+        ur.email `email`,
+        ur.phone `phone`,
+        cn.short_name `coinName`,
+        rg.qty `qty`,
+        rg.from_address `fromAddress`,
+        rg.to_address `to_address`,
+        rg.create_time `create_time`,
+        rg.type
+        from oax.recharge rg
+        left join oax.coin cn on rg.coin_id = cn.id
+        left join oax.user ur on rg.user_id = ur.id
+        <where>
+            <if test="userId != null">
+                and rg.user_id = #{userId}
+            </if>
+            <if test="username !=null">
+                and (ur.email like concat('%',#{username},'%') or ur.phone like concat('%',#{username},'%'))
+            </if>
+            <if test="coinId != null">
+                and cn.id = #{coinId}
+            </if>
+            <if test="startTime != null and endTime != null">
+                and rg.create_time between #{startTime} and #{endTime}
+            </if>
+        </where>
+        order by
+        <if test="sortQty != null">
+            <if test="sortQty == 0">
+                rg.qty
+            </if>
+            <if test="sortQty ==1">
+                rg.qty desc
+            </if>
+        </if>
+
+        <if test="sortQty == null">
+            rg.create_time desc
+        </if>
+    </select>
+    <select id="countTotalQtyByCoinId" resultType="java.math.BigDecimal">
+
+        select ifnull(sum(ifnull(qty, 0)), 0)
+        from oax.recharge
+        where coin_id = #{coinId};
+    </select>
+    <select id="selectByToAddress" resultType="com.oax.entity.front.Recharge">
+
+        select
+            <include refid="Base_Column_List"/>
+        from oax.recharge
+        where to_address = #{address}
+
+    </select>
+
+    <select id="selectByCoinIdAndTime" resultType="com.oax.entity.front.Recharge">
+        select
+            <include refid="Base_Column_List"/>
+        from oax.recharge
+        where coin_id = #{coinId}
+        and create_time >= #{startTime} and #{endTime} >= create_time
+    </select>
+
+
+    <insert id="insertIgnore">
+        insert ignore into oax.recharge
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="fromAddress != null">
+                from_address,
+            </if>
+            <if test="toAddress != null">
+                to_address,
+            </if>
+            <if test="qty != null">
+                qty,
+            </if>
+            <if test="txId != null">
+                tx_id,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="fromAddress != null">
+                #{fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="toAddress != null">
+                #{toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="qty != null">
+                #{qty,jdbcType=DECIMAL},
+            </if>
+            <if test="txId != null">
+                #{txId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+
+    </insert>
+
+    <select id="selectAll" resultType="com.oax.entity.front.Recharge">
+        select
+            <include refid="Base_Column_List"/>
+        from oax.recharge
+    </select>
+    <select id="selectSumVoByCoinIdAndTime" resultType="com.oax.entity.front.vo.RechargeSumVo">
+        select
+        qty
+        from oax.recharge
+        where coin_id = #{coinId}
+        and create_time >= #{startTime} and #{endTime} >= create_time
+    </select>
+
+</mapper>

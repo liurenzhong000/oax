@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.ctc.CtcAppealMapper">
+
+    <resultMap id="CtcAppealVoMap" type="com.oax.entity.admin.vo.CtcAppealVo">
+        <result column="type" property="type" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="orderStatus" property="orderStatus" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <resultMap id="CtcAppealMap" type="com.oax.entity.ctc.CtcAppeal">
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <select id="pageForAdmin" resultMap="CtcAppealVoMap">
+        SELECT
+        ca.id,
+        co.id AS ctcOrderId,
+        co.to_user_id AS userId,
+        IFNULL(u.email, u.phone ) AS userName,
+        u.id_name,
+        co.merchant_id,
+        co.from_user_id AS merchantUserId,
+        mu.id_name AS merchantIdName,
+        IFNULL(mu.email, mu.phone ) AS merchantUserName,
+        co.qty,
+        co.total_cost,
+        co.price,
+        co.type,
+        co.status AS orderStatus,
+        co.create_date,
+        co.finish_date,
+        ca.appeal_desc,
+        ca.status,
+        IF(ca.user_id = mu.id,'商户','用户') AS appealUser
+
+        FROM ctc_appeal ca
+        JOIN ctc_order co ON ca.ctc_order_id = co.id
+        JOIN merchant m ON m.id = co.merchant_id
+        JOIN `user` mu ON mu.id = m.user_id
+        JOIN `user` u ON (u.id = co.from_user_id OR u.id = co.to_user_id) AND u.id != m.user_id
+        where 1=1
+        <if test="ctcOrderId != null"> and co.id = #{ctcOrderId}</if>
+        <if test="userId != null"> and ((co.type = 0 and co.to_user_id = #{userId}) or (co.type = 1 AND co.from_user_id = #{userId}))</if>
+        <if test="status != null"> and ca.status = #{status}</if>
+        <if test="startTime != null">and ca.create_date >= #{startTime}</if>
+        <if test="endTime != null">and #{endTime} >= ca.create_date </if>
+        order by ca.create_date desc
+    </select>
+
+    <select id="getCanCancelByOrderId" resultMap="CtcAppealMap">
+        select * from ctc_appeal where 1 >= `status` and ctc_order_id = #{ctcOrderId} limit 1
+    </select>
+
+    <select id="isAppealed" resultType="java.lang.Boolean">
+      select IF(IFNULL(user_id,COUNT(*)) = #{userId},1,0) from ctc_appeal where ctc_order_id = #{ctcOrderId} and  1 >= `status` order by id desc limit 1
+    </select>
+
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.CoinLockConfigMapper">
+    <select id="getCoinLockConfig" resultType="com.oax.entity.front.CoinLockConfig">
+        SELECT
+          c1.id,
+          c1.coin_id coinId,
+          c.short_name coinName,
+          c1.standard_lock_qty standardLockQty,
+          c1.interest_rate interestRate,
+          c.image,
+          ratio
+      from oax.coin_lock_config c1
+      LEFT JOIN oax.coin c on c.id = c1.coin_id where c1.is_show =1;
+    </select>
+    <select id="selectCoinLockConfigById" resultType="com.oax.entity.front.CoinLockConfig" parameterType="integer">
+        SELECT
+          c1.id,
+          c1.coin_id coinId,
+          c.short_name coinName,
+          c1.standard_lock_qty standardLockQty,
+          c1.interest_rate interestRate,
+          ratio
+      from oax.coin_lock_config c1
+      LEFT JOIN oax.coin c on c.id = c1.coin_id where c1.id = #{id}
+    </select>
+    <select id="getUserCoinByCoinId" resultType="java.math.BigDecimal">
+        SELECT banlance from oax.user_coin where user_id = #{userId} and coin_id = #{coinId}
+    </select>
+    <select id="selectCoinLockConfigByCoinId" resultType="com.oax.entity.front.CoinLockConfig" parameterType="integer">
+        select standard_lock_qty standardLockQty from oax.coin_lock_config where coin_id = #{coinId}
+    </select>
+    <update id="update" parameterType="com.oax.entity.front.CoinLockConfig">
+        update oax.coin_lock_config
+        set standard_lock_qty = #{standardLockQty},
+        interest_rate = #{interestRate},
+        ratio=#{ratio},
+        update_time=now()
+        where id = #{id}
+    </update>
+    <insert id="save" parameterType="com.oax.entity.front.CoinLockConfig">
+        INSERT INTO oax.coin_lock_config
+        (coin_id,
+        standard_lock_qty,
+        interest_rate,
+        is_show,
+        ratio,
+        create_time,
+        update_time)
+        VALUES(
+        #{coinId},
+        #{standardLockQty},
+        #{interestRate},
+        #{isShow},
+        #{ratio},
+        #{createTime},
+        #{updateTime}
+        )
+
+    </insert>
+    <select id="getList" resultType="com.oax.entity.front.CoinLockConfig">
+        SELECT
+            c1.id,
+            f.id coinId,
+            f.short_name coinName,
+            IFNULL(c1.standard_lock_qty,0)standardLockQty,
+            IFNULL(c1.interest_rate,0) interestRate,
+            c1.is_show isShow,
+            c1.ratio
+        from
+        (select c.id,short_name from oax.coin c
+        where c.id not in(SELECT coin_id from oax.market_category)) f
+        LEFT JOIN oax.coin_lock_config c1
+        on c1.coin_id = f.id
+    </select>
+    <select id="selectById" resultType="com.oax.entity.front.CoinLockConfig" parameterType="integer">
+        SELECT
+            f.id,
+            f.coin_id coinId,
+            c.short_name coinName,
+            f.standard_lock_qty standardLockQty,
+            f.interest_rate interestRate,
+            f.is_show isShow,
+            f.ratio
+        FROM
+            oax.coin_lock_config f
+        LEFT JOIN oax.coin c ON f.coin_id = c.id
+        WHERE f.id = #{id}
+    </select>
+    <update id="isShow">
+        update oax.coin_lock_config set is_show = #{isShow}
+        where id = #{id}
+    </update>
+    <select id="getAllCoinLockConfig" resultType="com.oax.entity.front.CoinLockConfig">
+        SELECT
+          id,
+          coin_id coinId,
+          standard_lock_qty standardLockQty,
+          interest_rate interestRate,
+          ratio
+        from oax.coin_lock_config
+    </select>
+</mapper>

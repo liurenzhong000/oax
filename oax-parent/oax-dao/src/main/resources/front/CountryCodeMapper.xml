@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.CountryCodeMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.CountryCode">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="cn_name" jdbcType="VARCHAR" property="cnName"/>
+        <result column="en_name" jdbcType="VARCHAR" property="enName"/>
+        <result column="short_name" jdbcType="VARCHAR" property="shortName"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, cn_name, en_name, short_name,code
+    </sql>
+
+    <select id="list" resultMap="BaseResultMap">
+        select * from oax.country_code
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.country_code
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.country_code
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.CountryCode">
+        insert into oax.country_code (id, cn_name, en_name,
+        code)
+        values (#{id,jdbcType=INTEGER}, #{cnName,jdbcType=VARCHAR}, #{enName,jdbcType=VARCHAR},
+        #{code,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.CountryCode">
+        insert into oax.country_code
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="cnName != null">
+                cn_name,
+            </if>
+            <if test="enName != null">
+                en_name,
+            </if>
+            <if test="shortName != null">
+                short_name,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="cnName != null">
+                #{cnName,jdbcType=VARCHAR},
+            </if>
+            <if test="enName != null">
+                #{enName,jdbcType=VARCHAR},
+            </if>
+            <if test="shortName != null">
+                #{shortName,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.CountryCode">
+        update oax.country_code
+        <set>
+            <if test="cnName != null">
+                cn_name = #{cnName,jdbcType=VARCHAR},
+            </if>
+            <if test="enName != null">
+                en_name = #{enName,jdbcType=VARCHAR},
+            </if>
+            <if test="shortName != null">
+                short_name = #{shortName,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.CountryCode">
+        update oax.country_code
+        set cn_name = #{cnName,jdbcType=VARCHAR},
+        en_name = #{enName,jdbcType=VARCHAR},
+        code = #{code,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

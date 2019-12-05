@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.TradeSnapshotMapper">
+    <select id="getMarketIds" resultType="java.lang.Integer">
+        SELECT id from oax.market where is_mine =1
+    </select>
+    <select id="getTradeList" resultType="com.oax.entity.front.Trade">
+        SELECT market_id,
+               qty,
+               left_coin_id leftCoinId,
+               left_coin_name leftCoinName,
+               right_coin_id rightCoinId,
+               right_coin_name rightCoinName,
+               fee_coin_id feeCoinId,
+               fee
+        from oax.trade where market_id = #{marketId}
+        and create_time >= #{beginTime}
+        and #{endTime} >= create_time
+    </select>
+    <select id="getLastPrice" resultType="java.math.BigDecimal" parameterType="integer">
+        select price from oax.trade where market_id = #{marketId} ORDER BY id DESC limit 1
+    </select>
+    <select id="getMarketIdByCoinId" resultType="com.oax.entity.front.MarketInfo">
+        SELECT
+          m.id marketId,
+          c1.id coinId,
+          c2.id marketCoinId
+        from oax.market m
+        LEFT JOIN oax.coin c1 on c1.id = m.coin_id
+        LEFT JOIN oax.market_category mc on mc.id = m.market_category_id
+        JOIN oax.coin c2 on c2.id = mc.coin_id
+        where
+        (c1.id = #{leftCoinId} and c2.id = #{rightCoinId})
+        OR
+        (c2.id = #{leftCoinId} and c1.id = #{rightCoinId})
+    </select>
+    <insert id="insert" parameterType="com.oax.entity.front.TradeSnapshot">
+       INSERT INTO oax.trade_snapshot
+        (
+         maket_id,
+         begin_time,
+         end_time,
+         trade_qty,
+         fee_to_eth,
+         fee_to_x,
+         avg_feedback_x,
+         create_time,
+         status,
+         fee_to_leftcoin,
+         fee_to_rightcoin
+         )
+        VALUE
+        (
+         #{marketId},
+         #{beginTime},
+         #{endTime},
+         #{tradeQty},
+         #{feeToETH},
+         #{feeToX},
+         #{avgFeeBackX},
+         #{createTime},
+         #{status},
+         #{feeToLeftCoin},
+         #{feeToRightCoin}
+        )
+    </insert>
+    <select id="getTradeListForAvg" resultType="java.math.BigDecimal">
+        SELECT
+            IFNULL(sum(qty*price)/sum(qty),0)
+        from oax.trade where market_id = #{marketId}
+        and create_time >= #{beginTime}
+        and #{endTime} >= create_time
+    </select>
+
+    <select id="getCirculationTotal" resultType="java.math.BigDecimal">
+       SELECT ifnull(SUM(banlance+freezing_banlance),0) FROM user_coin where coin_id=3
+    </select>
+
+    <select id="getFeedBackSum" parameterType="java.lang.String" resultType="hashmap">
+        SELECT ROUND(ifnull(sum(fee_to_x),0),2) feedBackX,ROUND(ifnull(sum(fee_to_eth),0),2) feedBackETH FROM trade_snapshot where begin_time>=#{beginTime,jdbcType=VARCHAR} and end_time &lt;=now() and status=0
+    </select>
+
+    <select id="getTodayFeedBackdetail" parameterType="java.lang.String" resultType="hashmap">
+        SELECT  CONCAT(c1.short_name,"/",c2.short_name) marketName,ROUND(ifnull(sum(ts.fee_to_rightcoin),0),2) todayFeedBack,
+        ROUND(ifnull(sum(ts.fee_to_rightcoin)*0.8,0),2) todayTradeFeedBack,ROUND(ifnull(sum(ts.fee_to_rightcoin)*0.2,0),2) todayCompensationFeedBack
+        FROM trade_snapshot ts LEFT JOIN market m on m.id=ts.maket_id LEFT JOIN market_category mc
+        on mc.id=m.market_category_id LEFT JOIN coin c1 on c1.id=m.coin_id LEFT JOIN coin c2 on c2.id=mc.coin_id
+        where begin_time>=#{beginTime,jdbcType=VARCHAR} and end_time &lt;=now() and status=0 GROUP BY ts.maket_id ORDER BY ts.fee_to_rightcoin desc
+    </select>
+    <select id="getBanlanceX" resultType="java.math.BigDecimal" parameterType="integer">
+        select  u2.banlance
+        from
+        (select id from oax.user where id = #{userId} and level =2) u1
+        LEFT JOIN
+        (SELECT user_id,banlance from oax.user_coin where user_id = #{userId} and coin_id =3) u2
+        on u1.id = u2.user_id
+    </select>
+    <select id="getFeedBackToDay" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT ROUND(ifnull(sum(fee_to_x),0),2) feedBackX  FROM trade_snapshot where begin_time>= #{beginTime} and status=0
+    </select>
+    <select id="MiningMarket" resultType="java.util.Map">
+        SELECT
+            m.id marketId,
+            CONCAT(
+                c1.short_name,
+                '/',
+                c2.short_name
+            ) marketName
+        FROM
+            oax.market m
+        LEFT JOIN oax.coin c1 ON c1.id = m.coin_id
+        LEFT JOIN oax.market_category mc ON m.market_category_id = mc.id
+        LEFT JOIN oax.coin c2 ON c2.id = mc.coin_id
+        WHERE
+            m.is_mine = 1
+        ORDER BY
+            mc.sort_num,
+            m.sort_num
+    </select>
+</mapper>

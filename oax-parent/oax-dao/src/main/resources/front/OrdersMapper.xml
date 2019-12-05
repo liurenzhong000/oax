@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.OrdersMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.Orders">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="market_id" jdbcType="INTEGER" property="marketId"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="qty" jdbcType="DECIMAL" property="qty"/>
+        <result column="trade_qty" jdbcType="DECIMAL" property="tradeQty"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="version" jdbcType="INTEGER" property="version"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, market_id, type, price, qty, trade_qty, status, version, create_time,
+        update_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.orders
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.orders
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.oax.entity.front.Orders">
+        insert into oax.orders (user_id, market_id, left_coin_id, right_coin_id,
+                                type, price, qty, trade_qty,
+                                status, version, left_coin_name, right_coin_name, create_time,
+                                update_time, rank)
+        values (#{userId,jdbcType=INTEGER}, #{marketId,jdbcType=INTEGER},
+                                            (#{leftCoinId,jdbcType=INTEGER}),
+                                            (#{rightCoinId,jdbcType=INTEGER}),
+                                            #{type,jdbcType=INTEGER}, #{price,jdbcType=DECIMAL},
+                                            #{qty,jdbcType=DECIMAL}, 0,
+                                            0, 1,
+                                            (#{leftCoinName,jdbcType=VARCHAR}),
+                (#{rightCoinName,jdbcType=VARCHAR}),
+                now(),
+                now(),
+                #{rank,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.Orders">
+        insert into oax.orders
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="marketId != null">
+                market_id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="qty != null">
+                qty,
+            </if>
+            <if test="tradeQty != null">
+                trade_qty,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="version != null">
+                version,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="marketId != null">
+                #{marketId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="qty != null">
+                #{qty,jdbcType=DECIMAL},
+            </if>
+            <if test="tradeQty != null">
+                #{tradeQty,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.Orders">
+        update oax.orders
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="marketId != null">
+                market_id = #{marketId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="qty != null">
+                qty = #{qty,jdbcType=DECIMAL},
+            </if>
+            <if test="tradeQty != null">
+                trade_qty = #{tradeQty,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="version != null">
+                version = #{version,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.Orders">
+        update oax.orders
+        set user_id     = #{userId,jdbcType=INTEGER},
+            market_id   = #{marketId,jdbcType=INTEGER},
+            type        = #{type,jdbcType=INTEGER},
+            price       = #{price,jdbcType=DECIMAL},
+            qty         = #{qty,jdbcType=DECIMAL},
+            trade_qty   = #{tradeQty,jdbcType=DECIMAL},
+            status      = #{status,jdbcType=INTEGER},
+            version     = #{version,jdbcType=INTEGER},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <select id="getUserInfo" parameterType="int" resultType="com.oax.entity.front.Member">
+        SELECT
+            id,
+            need_transaction_password needTransactionPassword,
+            transaction_password      transactionPassword
+        FROM oax.user
+        WHERE id = #{id}
+    </select>
+
+
+    <select id="selectByOrderPageParam" resultType="com.oax.entity.admin.vo.OrdersPageVo">
+        select
+        od.id `id`,
+        us.id `userId`,
+        us.phone `phone`,
+        us.email `email`,
+        od.left_coin_name `marketCoin`,
+        od.right_coin_name `marketCategoryCoin`,
+        od.price `price`,
+        od.qty `qty`,
+        ifnull(od.price ,0)* ifnull(od.qty ,0) `totalPrices`,
+        od.trade_qty `trade_qty`,
+
+        od.type `type`,
+        od.status `status`,
+        od.create_time `createTime`
+        from oax.orders od
+        left join oax.user us on us.id = od.user_id
+
+        <where>
+            <if test="userId!=null">
+                and od.user_id = #{userId}
+            </if>
+            <if test="username!=null">
+                and (us.email like concat('%',#{username},'%') or us.phone like concat('%',#{username},'%'))
+            </if>
+            <if test="marketId!=null">
+                and od.market_id = #{marketId}
+            </if>
+            <if test="orderType!=null">
+                and od.type = #{orderType}
+            </if>
+            <if test="orderStatus!=null">
+                and od.status = #{orderStatus}
+            </if>
+            <if test="startTime !=null and endTime!=null">
+                and od.create_time between #{startTime} and #{endTime}
+                <if test="price != null">
+                    and od.price = #{price}
+                </if>
+            </if>
+
+        </where>
+        order by
+        <if test="sortTotalPrices != null">
+            <if test="sortTotalPrices ==0">
+                totalPrices
+
+            </if>
+            <if test="sortTotalPrices ==1">
+                totalPrices desc
+            </if>
+        </if>
+
+        <if test="sortPrice != null">
+            <if test="sortPrice == 0">
+                od.price
+            </if>
+            <if test="sortPrice == 1">
+                od.price desc
+            </if>
+        </if>
+
+        <if test="sortQty != null">
+            <if test="sortQty == 0">
+                od.qty
+            </if>
+            <if test="sortQty == 1">
+                od.qty desc
+            </if>
+        </if>
+
+        <if test="sortTotalPrices == null and sortPrice == null and sortQty == null">
+            od.create_time desc
+        </if>
+    </select>
+    <select id="findMarketOrdersList" resultType="com.oax.entity.front.MarketOrders">
+        SELECT f.price ,SUM(f.qty - f.trade_qty)qty,SUM(f.price * (f.qty - f.trade_qty))amount from
+        (SELECT
+          price,
+          qty,
+          trade_qty
+          from oax.orders where market_id = #{marketId}
+          and status = 1 and type = #{type}
+        UNION ALL
+        SELECT price,qty,trade_qty from oax.orders
+          where market_id = #{marketId}
+          and status = 2 and type = #{type}
+        ) f
+        GROUP BY f.price
+        <if test="type==1">
+            order by f.price desc
+        </if>
+        <if test="type==2">
+            order by f.price asc
+        </if>
+        limit 15
+    </select>
+    <select id="findMarketOrders" resultType="com.oax.entity.front.MarketOrders">
+        SELECT f.price ,SUM(f.qty - f.trade_qty)qty,SUM(f.price * (f.qty - f.trade_qty))amount from
+        (SELECT
+        price,
+        qty,
+        trade_qty
+        from oax.orders where market_id = #{marketId}
+        and status in( 0,1)  and type = #{type}
+        UNION ALL
+        SELECT price,qty,trade_qty from oax.orders
+        where market_id = #{marketId}
+        and status = 2 and type = #{type}
+        ) f
+        GROUP BY f.price
+        <if test="type==1">
+            order by f.price desc
+        </if>
+        <if test="type==2">
+            order by f.price asc
+        </if>
+        <if test="number!=null">
+            limit #{number}
+        </if>
+    </select>
+    <select id="isNeedTransactionPassword" resultType="java.lang.String" parameterType="int">
+        select need_transaction_password
+        from oax.user
+        where id = #{userId}
+    </select>
+
+    <update id="upStatus" parameterType="int">
+        update oax.orders
+        set status = 1, version = version + 1, update_time = NOW()
+        where id = #{id} and status = 0
+    </update>
+
+    <update id="updateStatus">
+        update oax.orders set status =#{status} , version = version+1,update_time = NOW()
+        where id = #{id}
+        <if test="version!=null">
+            and version = #{version}
+        </if>
+
+    </update>
+
+    <update id="updateTradeQty">
+        update oax.orders
+        set trade_qty = trade_qty + #{tradeQty}, version = version + 1, status = 2, update_time = NOW()
+        where id = #{id} and version = #{version}
+    </update>
+
+    <select id="getOrderById" parameterType="int" resultType="com.oax.entity.front.Orders">
+        SELECT
+            id,
+            user_id         userId,
+            market_id       marketId,
+            left_coin_id    leftCoinId,
+            right_coin_id   rightCoinId,
+            left_coin_name  leftCoinName,
+            right_coin_name rightCoinName,
+            type,
+            price,
+            qty,
+            trade_qty       tradeQty,
+            STATUS,
+            version,
+            type
+        FROM oax.orders
+        where id = #{id}
+    </select>
+
+    <select id="getMatchOrder" resultType="com.oax.entity.front.Orders">
+        SELECT
+        f.id,
+        f.userId,
+        f.marketId ,
+        f.type,
+        f.price,
+        f.qty,
+        f.tradeQty,
+        f.leftCoinId,
+        f.rightCoinId,
+        f.leftCoinName,
+        f.rightCoinName,
+        f.STATUS,
+        f.version
+        FROM
+        (SELECT id, user_id userId, market_id marketId,type, price,qty,trade_qty tradeQty,
+        left_coin_id leftCoinId,right_coin_id rightCoinId,
+        left_coin_name leftCoinName,
+        right_coin_name rightCoinName,
+        STATUS,version
+        FROM oax.orders
+        WHERE market_id = #{marketId} AND type = #{type} AND status = 1 AND #{id}>id
+        UNION ALL
+        SELECT id, user_id userId, market_id marketId,type, price,qty,trade_qty tradeQty,
+        left_coin_id leftCoinId,right_coin_id rightCoinId,
+        left_coin_name leftCoinName,
+        right_coin_name rightCoinName,
+        STATUS,version
+        FROM oax.orders
+        WHERE market_id = #{marketId} AND type = #{type} AND status = 2 AND #{id}>id) f
+        <!--查买入  查价格最高的一条订单-->
+        <if test="type==1">
+            order by f.price desc,f.id
+        </if>
+        <!--查卖出  查价格最低的一条订单-->
+        <if test="type==2">
+            order by f.price, f.id
+        </if>
+        LIMIT 1
+    </select>
+
+    <select id="getOrdersByUserIdAndStatus" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT o.id,o.type,o.price,o.qty,o.trade_qty,o.status,o.create_time createTime FROM orders o
+        where o.user_id=#{userId,jdbcType=INTEGER} AND o.market_id=#{marketId,jdbcType=INTEGER}
+        <if test="status!=null">
+            AND o.`status`=#{status,jdbcType=INTEGER}
+        </if>
+        order by create_time desc limit 50
+    </select>
+    <update id="cancelOrder" parameterType="int">
+        UPDATE oax.orders
+        SET STATUS      = -1,
+            version     = version + 1,
+            update_time = NOW(),
+            cancel_time = NOW()
+        WHERE id = #{id} and user_id = #{userId} and version = #{version}
+    </update>
+    <update id="updateBuyUserCoin">
+        UPDATE oax.user_coin
+        SET banlance          = banlance + #{unsettledAmount},
+            freezing_banlance = freezing_banlance - #{unsettledAmount}
+        WHERE user_id = #{userId}
+              AND coin_id = (SELECT coin_id
+                             FROM oax.market_category
+                             WHERE id = (SELECT market_category_id
+                                         FROM oax.market
+                                         WHERE id = #{marketId}))
+    </update>
+    <update id="updateSellUserCoin">
+        UPDATE oax.user_coin
+        SET banlance          = banlance + #{unsettledAmount},
+            freezing_banlance = freezing_banlance - #{unsettledAmount}
+        WHERE user_id = #{userId}
+              AND coin_id = (SELECT coin_id
+                             FROM oax.market
+                             WHERE id = #{marketId})
+    </update>
+    <select id="verifyUserIsLock" parameterType="int" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM oax.user
+        WHERE id = #{userId} and lock_status = 0
+    </select>
+    <select id="getPrecision" parameterType="int" resultType="com.oax.entity.front.MarketInfo">
+        SELECT
+            price_decimals priceDecimals,
+            qty_decimals   qtyDecimals
+        FROM oax.market
+        WHERE id = #{marketId}
+    </select>
+    <select id="getCoinInfo" resultType="com.oax.entity.front.Orders" parameterType="int">
+        SELECT
+            c1.id         leftCoinId,
+            c1.short_name leftCoinName,
+            c2.id         rightCoinId,
+            c2.short_name rightCoinName
+        FROM
+            oax.market m1
+            LEFT JOIN oax.coin c1 ON c1.id = m1.coin_id
+            LEFT JOIN oax.market_category m2 ON m1.market_category_id = m2.id
+            JOIN oax.coin c2 ON m2.coin_id = c2.id
+        where m1.id = #{marketId}
+    </select>
+
+    <select id="getOrderByTimeAndMarketId" resultType="com.oax.entity.front.Orders">
+        SELECT
+            id,
+            user_id         userId,
+            market_id       marketId,
+            left_coin_id    leftCoinId,
+            right_coin_id   rightCoinId,
+            left_coin_name  leftCoinName,
+            right_coin_name rightCoinName,
+            type,
+            price,
+            qty,
+            trade_qty       tradeQty,
+            STATUS,
+            version,
+            type
+        FROM oax.orders
+        where market_id = #{marketId,jdbcType=INTEGER} and create_time &lt;= #{endTime,jdbcType=VARCHAR} and
+              create_time &gt;= #{beginTime,jdbcType=VARCHAR} and user_id != #{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="getAutoOrders" resultType="com.oax.entity.front.Orders">
+        SELECT
+            id,
+            user_id         userId,
+            market_id       marketId,
+            left_coin_id    leftCoinId,
+            right_coin_id   rightCoinId,
+            left_coin_name  leftCoinName,
+            right_coin_name rightCoinName,
+            type,
+            price,
+            qty,
+            trade_qty       tradeQty,
+            STATUS,
+            version,
+            type
+        FROM oax.orders
+        where market_id = #{marketId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER} and status &lt;= 2 and
+              status &gt;= 0 and id &lt; #{orderId,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteOrders">
+        delete from oax.orders
+        where market_id = #{marketId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER} and status = -1 and
+              trade_qty = 0 and create_time &lt; #{endTime,jdbcType=VARCHAR}
+    </delete>
+
+    <select id="selectLastOrderId" resultType="integer">
+        SELECT max(id)
+        FROM oax.orders
+    </select>
+    <select id="listBhbUsdtSallOrder" resultType="java.util.Map">
+        SELECT id,user_id as userId FROM orders WHERE `type`=2 AND `status` IN (0,1) AND market_id = 77 AND user_id NOT IN (93677,242648)
+    </select>
+</mapper>

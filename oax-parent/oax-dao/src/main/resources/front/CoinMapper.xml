@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.CoinMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.Coin">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="propertyid" jdbcType="INTEGER" property="propertyid"/>
+        <result column="image" jdbcType="VARCHAR" property="image"/>
+        <result column="short_name" jdbcType="VARCHAR" property="shortName"/>
+        <result column="full_name" jdbcType="VARCHAR" property="fullName"/>
+        <result column="cn_name" jdbcType="VARCHAR" property="cnName"/>
+        <result column="decimals" jdbcType="SMALLINT" property="decimals"/>
+        <result column="contract_address" jdbcType="VARCHAR" property="contractAddress"/>
+        <result column="method_id" jdbcType="VARCHAR" property="methodId"/>
+        <result column="server_ip" jdbcType="VARCHAR" property="serverIp"/>
+        <result column="server_port" jdbcType="INTEGER" property="serverPort"/>
+        <result column="main_address" jdbcType="VARCHAR" property="mainAddress"/>
+        <result column="main_address_password" jdbcType="VARCHAR" property="mainAddressPassword"/>
+        <result column="gas_price" jdbcType="INTEGER" property="gasPrice"/>
+        <result column="gas_limit" jdbcType="INTEGER" property="gasLimit"/>
+        <result column="cold_address" jdbcType="VARCHAR" property="coldAddress"/>
+        <result column="out_qty_to_cold_address" jdbcType="DECIMAL" property="outQtyToColdAddress"/>
+        <result column="allow_recharge" jdbcType="INTEGER" property="allowRecharge"/>
+        <result column="allow_withdraw" jdbcType="INTEGER" property="allowWithdraw"/>
+        <result column="withdraw_fee" jdbcType="DECIMAL" property="withdrawFee"/>
+        <result column="max_out_qty" jdbcType="DECIMAL" property="maxOutQty"/>
+        <result column="min_out_qty" jdbcType="DECIMAL" property="minOutQty"/>
+        <result column="warning_qty" jdbcType="DECIMAL" property="warningQty"/>
+        <result column="out_qty_to_main_address" jdbcType="DECIMAL" property="outQtyToMainAddress"/>
+        <result column="server_username" jdbcType="VARCHAR" property="serverUsername"/>
+        <result column="server_password" jdbcType="VARCHAR" property="serverPassword"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.oax.entity.front.CoinWithBLOBs">
+        <result column="cn_description" jdbcType="LONGVARCHAR" property="cnDescription"/>
+        <result column="en_description" jdbcType="LONGVARCHAR" property="enDescription"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, parent_id, type,propertyid, image, short_name, full_name, cn_name, decimals, contract_address,
+        method_id, server_ip, server_port, main_address, main_address_password, gas_price,
+        gas_limit, cold_address, out_qty_to_cold_address, allow_recharge, allow_withdraw,
+        withdraw_fee, max_out_qty, min_out_qty, warning_qty, out_qty_to_main_address, server_username,
+        server_password, create_time, update_time
+    </sql>
+    <sql id="Blob_Column_List">
+        cn_description, en_description
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax.coin
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.coin
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.CoinWithBLOBs">
+        insert into oax.coin (id, parent_id, type,propertyid,
+                              image, short_name, full_name,
+                              cn_name, decimals, contract_address,
+                              method_id, server_ip, server_port,
+                              main_address, main_address_password, gas_price,
+                              gas_limit, cold_address, out_qty_to_cold_address,
+                              allow_recharge, allow_withdraw, withdraw_fee,
+                              max_out_qty, min_out_qty, warning_qty,
+                              out_qty_to_main_address, server_username, server_password,
+                              create_time, update_time, cn_description,
+                              en_description)
+        values (#{id,jdbcType=INTEGER}, #{parentId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER},#{propertyid,jdbcType=INTEGER},
+            #{image,jdbcType=VARCHAR}, #{shortName,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR},
+            #{cnName,jdbcType=VARCHAR}, #{decimals,jdbcType=SMALLINT}, #{contractAddress,jdbcType=VARCHAR},
+            #{methodId,jdbcType=VARCHAR}, #{serverIp,jdbcType=VARCHAR}, #{serverPort,jdbcType=INTEGER},
+            #{mainAddress,jdbcType=VARCHAR}, #{mainAddressPassword,jdbcType=VARCHAR}, #{gasPrice,jdbcType=INTEGER},
+            #{gasLimit,jdbcType=INTEGER}, #{coldAddress,jdbcType=VARCHAR}, #{outQtyToColdAddress,jdbcType=DECIMAL},
+            #{allowRecharge,jdbcType=INTEGER}, #{allowWithdraw,jdbcType=INTEGER}, #{withdrawFee,jdbcType=DECIMAL},
+            #{maxOutQty,jdbcType=DECIMAL}, #{minOutQty,jdbcType=DECIMAL}, #{warningQty,jdbcType=DECIMAL},
+            #{outQtyToMainAddress,jdbcType=DECIMAL}, #{serverUsername,jdbcType=VARCHAR},
+            #{serverPassword,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{cnDescription,jdbcType=LONGVARCHAR},
+            #{enDescription,jdbcType=LONGVARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.CoinWithBLOBs" useGeneratedKeys="true" keyProperty="id">
+        insert into oax.coin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="propertyid != null">
+                propertyid,
+            </if>
+            <if test="image != null">
+                image,
+            </if>
+            <if test="shortName != null">
+                short_name,
+            </if>
+            <if test="fullName != null">
+                full_name,
+            </if>
+            <if test="cnName != null">
+                cn_name,
+            </if>
+            <if test="decimals != null">
+                decimals,
+            </if>
+            <if test="contractAddress != null">
+                contract_address,
+            </if>
+            <if test="methodId != null">
+                method_id,
+            </if>
+            <if test="serverIp != null">
+                server_ip,
+            </if>
+            <if test="serverPort != null">
+                server_port,
+            </if>
+            <if test="mainAddress != null">
+                main_address,
+            </if>
+            <if test="mainAddressPassword != null">
+                main_address_password,
+            </if>
+            <if test="gasPrice != null">
+                gas_price,
+            </if>
+            <if test="gasLimit != null">
+                gas_limit,
+            </if>
+            <if test="coldAddress != null">
+                cold_address,
+            </if>
+            <if test="outQtyToColdAddress != null">
+                out_qty_to_cold_address,
+            </if>
+            <if test="allowRecharge != null">
+                allow_recharge,
+            </if>
+            <if test="allowWithdraw != null">
+                allow_withdraw,
+            </if>
+            <if test="withdrawFee != null">
+                withdraw_fee,
+            </if>
+            <if test="maxOutQty != null">
+                max_out_qty,
+            </if>
+            <if test="minOutQty != null">
+                min_out_qty,
+            </if>
+            <if test="warningQty != null">
+                warning_qty,
+            </if>
+            <if test="outQtyToMainAddress != null">
+                out_qty_to_main_address,
+            </if>
+            <if test="serverUsername != null">
+                server_username,
+            </if>
+            <if test="serverPassword != null">
+                server_password,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="cnDescription != null">
+                cn_description,
+            </if>
+            <if test="enDescription != null">
+                en_description,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="propertyid != null">
+                #{propertyid,jdbcType=INTEGER},
+            </if>
+            <if test="image != null">
+                #{image,jdbcType=VARCHAR},
+            </if>
+            <if test="shortName != null">
+                #{shortName,jdbcType=VARCHAR},
+            </if>
+            <if test="fullName != null">
+                #{fullName,jdbcType=VARCHAR},
+            </if>
+            <if test="cnName != null">
+                #{cnName,jdbcType=VARCHAR},
+            </if>
+            <if test="decimals != null">
+                #{decimals,jdbcType=SMALLINT},
+            </if>
+            <if test="contractAddress != null">
+                #{contractAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="methodId != null">
+                #{methodId,jdbcType=VARCHAR},
+            </if>
+            <if test="serverIp != null">
+                #{serverIp,jdbcType=VARCHAR},
+            </if>
+            <if test="serverPort != null">
+                #{serverPort,jdbcType=INTEGER},
+            </if>
+            <if test="mainAddress != null">
+                #{mainAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="mainAddressPassword != null">
+                #{mainAddressPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="gasPrice != null">
+                #{gasPrice,jdbcType=INTEGER},
+            </if>
+            <if test="gasLimit != null">
+                #{gasLimit,jdbcType=INTEGER},
+            </if>
+            <if test="coldAddress != null">
+                #{coldAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="outQtyToColdAddress != null">
+                #{outQtyToColdAddress,jdbcType=DECIMAL},
+            </if>
+            <if test="allowRecharge != null">
+                #{allowRecharge,jdbcType=INTEGER},
+            </if>
+            <if test="allowWithdraw != null">
+                #{allowWithdraw,jdbcType=INTEGER},
+            </if>
+            <if test="withdrawFee != null">
+                #{withdrawFee,jdbcType=DECIMAL},
+            </if>
+            <if test="maxOutQty != null">
+                #{maxOutQty,jdbcType=DECIMAL},
+            </if>
+            <if test="minOutQty != null">
+                #{minOutQty,jdbcType=DECIMAL},
+            </if>
+            <if test="warningQty != null">
+                #{warningQty,jdbcType=DECIMAL},
+            </if>
+            <if test="outQtyToMainAddress != null">
+                #{outQtyToMainAddress,jdbcType=DECIMAL},
+            </if>
+            <if test="serverUsername != null">
+                #{serverUsername,jdbcType=VARCHAR},
+            </if>
+            <if test="serverPassword != null">
+                #{serverPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cnDescription != null">
+                #{cnDescription,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="enDescription != null">
+                #{enDescription,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.CoinWithBLOBs">
+        update oax.coin
+        <set>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="propertyid != null">
+                propertyid = #{propertyid,jdbcType=INTEGER},
+            </if>
+            <if test="image != null">
+                image = #{image,jdbcType=VARCHAR},
+            </if>
+            <if test="shortName != null">
+                short_name = #{shortName,jdbcType=VARCHAR},
+            </if>
+            <if test="fullName != null">
+                full_name = #{fullName,jdbcType=VARCHAR},
+            </if>
+            <if test="cnName != null">
+                cn_name = #{cnName,jdbcType=VARCHAR},
+            </if>
+            <if test="decimals != null">
+                decimals = #{decimals,jdbcType=SMALLINT},
+            </if>
+            <if test="contractAddress != null">
+                contract_address = #{contractAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="methodId != null">
+                method_id = #{methodId,jdbcType=VARCHAR},
+            </if>
+            <if test="serverIp != null">
+                server_ip = #{serverIp,jdbcType=VARCHAR},
+            </if>
+            <if test="serverPort != null">
+                server_port = #{serverPort,jdbcType=INTEGER},
+            </if>
+            <if test="mainAddress != null">
+                main_address = #{mainAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="mainAddressPassword != null">
+                main_address_password = #{mainAddressPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="gasPrice != null">
+                gas_price = #{gasPrice,jdbcType=INTEGER},
+            </if>
+            <if test="gasLimit != null">
+                gas_limit = #{gasLimit,jdbcType=INTEGER},
+            </if>
+            <if test="coldAddress != null">
+                cold_address = #{coldAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="outQtyToColdAddress != null">
+                out_qty_to_cold_address = #{outQtyToColdAddress,jdbcType=DECIMAL},
+            </if>
+            <if test="allowRecharge != null">
+                allow_recharge = #{allowRecharge,jdbcType=INTEGER},
+            </if>
+            <if test="allowWithdraw != null">
+                allow_withdraw = #{allowWithdraw,jdbcType=INTEGER},
+            </if>
+            <if test="withdrawFee != null">
+                withdraw_fee = #{withdrawFee,jdbcType=DECIMAL},
+            </if>
+            <if test="maxOutQty != null">
+                max_out_qty = #{maxOutQty,jdbcType=DECIMAL},
+            </if>
+            <if test="minOutQty != null">
+                min_out_qty = #{minOutQty,jdbcType=DECIMAL},
+            </if>
+            <if test="warningQty != null">
+                warning_qty = #{warningQty,jdbcType=DECIMAL},
+            </if>
+            <if test="outQtyToMainAddress != null">
+                out_qty_to_main_address = #{outQtyToMainAddress,jdbcType=DECIMAL},
+            </if>
+            <if test="serverUsername != null">
+                server_username = #{serverUsername,jdbcType=VARCHAR},
+            </if>
+            <if test="serverPassword != null">
+                server_password = #{serverPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cnDescription != null">
+                cn_description = #{cnDescription,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="enDescription != null">
+                en_description = #{enDescription,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.oax.entity.front.CoinWithBLOBs">
+        update oax.coin
+        set parent_id               = #{parentId,jdbcType=INTEGER},
+            type                    = #{type,jdbcType=INTEGER},
+            propertyid                    = #{propertyid,jdbcType=INTEGER},
+            image                   = #{image,jdbcType=VARCHAR},
+            short_name              = #{shortName,jdbcType=VARCHAR},
+            full_name               = #{fullName,jdbcType=VARCHAR},
+            cn_name                 = #{cnName,jdbcType=VARCHAR},
+            decimals                = #{decimals,jdbcType=SMALLINT},
+            contract_address        = #{contractAddress,jdbcType=VARCHAR},
+            method_id               = #{methodId,jdbcType=VARCHAR},
+            server_ip               = #{serverIp,jdbcType=VARCHAR},
+            server_port             = #{serverPort,jdbcType=INTEGER},
+            main_address            = #{mainAddress,jdbcType=VARCHAR},
+            main_address_password   = #{mainAddressPassword,jdbcType=VARCHAR},
+            gas_price               = #{gasPrice,jdbcType=INTEGER},
+            gas_limit               = #{gasLimit,jdbcType=INTEGER},
+            cold_address            = #{coldAddress,jdbcType=VARCHAR},
+            out_qty_to_cold_address = #{outQtyToColdAddress,jdbcType=DECIMAL},
+            allow_recharge          = #{allowRecharge,jdbcType=INTEGER},
+            allow_withdraw          = #{allowWithdraw,jdbcType=INTEGER},
+            withdraw_fee            = #{withdrawFee,jdbcType=DECIMAL},
+            max_out_qty             = #{maxOutQty,jdbcType=DECIMAL},
+            min_out_qty             = #{minOutQty,jdbcType=DECIMAL},
+            warning_qty             = #{warningQty,jdbcType=DECIMAL},
+            out_qty_to_main_address = #{outQtyToMainAddress,jdbcType=DECIMAL},
+            server_username         = #{serverUsername,jdbcType=VARCHAR},
+            server_password         = #{serverPassword,jdbcType=VARCHAR},
+            create_time             = #{createTime,jdbcType=TIMESTAMP},
+            update_time             = #{updateTime,jdbcType=TIMESTAMP},
+            cn_description          = #{cnDescription,jdbcType=LONGVARCHAR},
+            en_description          = #{enDescription,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.Coin">
+        update oax.coin
+        set parent_id               = #{parentId,jdbcType=INTEGER},
+            type                    = #{type,jdbcType=INTEGER},
+            propertyid                    = #{propertyid,jdbcType=INTEGER},
+            image                   = #{image,jdbcType=VARCHAR},
+            short_name              = #{shortName,jdbcType=VARCHAR},
+            full_name               = #{fullName,jdbcType=VARCHAR},
+            cn_name                 = #{cnName,jdbcType=VARCHAR},
+            decimals                = #{decimals,jdbcType=SMALLINT},
+            contract_address        = #{contractAddress,jdbcType=VARCHAR},
+            method_id               = #{methodId,jdbcType=VARCHAR},
+            server_ip               = #{serverIp,jdbcType=VARCHAR},
+            server_port             = #{serverPort,jdbcType=INTEGER},
+            main_address            = #{mainAddress,jdbcType=VARCHAR},
+            main_address_password   = #{mainAddressPassword,jdbcType=VARCHAR},
+            gas_price               = #{gasPrice,jdbcType=INTEGER},
+            gas_limit               = #{gasLimit,jdbcType=INTEGER},
+            cold_address            = #{coldAddress,jdbcType=VARCHAR},
+            out_qty_to_cold_address = #{outQtyToColdAddress,jdbcType=DECIMAL},
+            allow_recharge          = #{allowRecharge,jdbcType=INTEGER},
+            allow_withdraw          = #{allowWithdraw,jdbcType=INTEGER},
+            withdraw_fee            = #{withdrawFee,jdbcType=DECIMAL},
+            max_out_qty             = #{maxOutQty,jdbcType=DECIMAL},
+            min_out_qty             = #{minOutQty,jdbcType=DECIMAL},
+            warning_qty             = #{warningQty,jdbcType=DECIMAL},
+            out_qty_to_main_address = #{outQtyToMainAddress,jdbcType=DECIMAL},
+            server_username         = #{serverUsername,jdbcType=VARCHAR},
+            server_password         = #{serverPassword,jdbcType=VARCHAR},
+            create_time             = #{createTime,jdbcType=TIMESTAMP},
+            update_time             = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <sql id="Token_Column">
+
+        c1.id `id`,
+        c1.type `type`,
+        c1.propertyid `propertyid`,
+        c1.image `image`,
+        c1.short_name `short_name`,
+        c1.full_name,
+        c1.cn_name,
+        c1.decimals,
+        c1.contract_address,
+        c1.method_id,
+        c1.out_qty_to_cold_address,
+        c1.allow_recharge,
+        c1.allow_withdraw,
+        c1.withdraw_fee,
+        c1.max_out_qty,
+        c1.min_out_qty,
+        c1.warning_qty,
+        c1.out_qty_to_main_address,
+        c1.cn_description,
+        c1.en_description,
+        c1.create_time,
+        c1.update_time,
+        c1.parent_id
+        ,
+
+        <include refid="Token_To_Eth_Column"/>
+
+    </sql>
+
+    <sql id="Token_To_Eth_Column">
+        c2.server_ip,
+        c2.server_port,
+        c2.main_address,
+        c2.main_address_password,
+        c2.cold_address
+    </sql>
+
+    <update id="updateAllEHTAndTokenGasPrice">
+        update oax.coin
+        set gas_price = #{gasPrice}
+        where (type = 1 or type = 3)
+
+    </update>
+
+
+    <select id="selectSimpleCoinByParam" resultType="com.oax.entity.admin.vo.SimpleCoin">
+        select
+        <include refid="Token_Column"/>
+        from oax.coin c1
+        left join oax.coin c2
+        on ifnull(c1.parent_id,c1.id) = c2.id
+        <where>
+            <if test="coinId != null">
+                and c1.id = #{coinId}
+            </if>
+            <if test="startTime!=null and endTime!= null">
+                and c1.update_time between #{startTime} and #{endTime}
+            </if>
+        </where>
+        order by c1.update_time
+    </select>
+    <select id="selectNameAll" resultType="com.oax.entity.admin.vo.MarketCoinVo">
+        select
+            id         `coinId`,
+            type,
+            short_name `coinName`
+        from oax.coin
+    </select>
+
+    <select id="selectCoinOutQtyCountVoByPage" resultType="com.oax.entity.admin.vo.CoinOutQtyCountVo">
+        select
+        c1.id `coinId`,
+        c1.short_name `coinName`,
+        c1.type `type`,
+        c1.contract_address `contract_address`,
+        c1.propertyid `propertyid`
+        ,
+
+        <include refid="Token_To_Eth_Column"/>
+        from oax.coin c1
+        left join oax.coin c2
+        on ifnull(c1.parent_id,c1.id) = c2.id
+        <where>
+            <if test="coinId != null">
+                c1.id = #{coinId}
+            </if>
+        </where>
+    </select>
+    <select id="selectByNameAndWithOutId" resultType="com.oax.entity.front.Coin">
+
+        select
+        <include refid="Base_Column_List"/>
+        from oax.coin
+        <where>
+            (short_name = #{shortName} or full_name = #{fullName} or cn_name = #{cnName})
+            <if test="withOutId!=null">
+                and id!=#{withOutId}
+            </if>
+        </where>
+    </select>
+    <select id="selectByType" resultType="com.oax.entity.front.Coin">
+
+        select
+        <include refid="Token_Column"/>
+        from oax.coin c1
+        left join oax.coin c2
+        on ifnull(c1.parent_id,c1.id) = c2.id
+        where c1.type = #{type}
+
+    </select>
+    <select id="selectByShortName" resultType="com.oax.entity.front.Coin">
+        select
+        <include refid="Token_Column"/>
+        from oax.coin c1
+        left join oax.coin c2
+        on ifnull(c1.parent_id,c1.id) = c2.id
+        where c1.short_name = #{shortName,jdbcType=VARCHAR}
+    </select>
+    <select id="selectAll" resultType="com.oax.entity.front.Coin">
+
+        select
+        <include refid="Token_Column"/>
+        from oax.coin c1
+        left join oax.coin c2
+        on ifnull(c1.parent_id,c1.id) = c2.id
+    </select>
+
+    <select id="selectByContractAddress" resultType="com.oax.entity.front.Coin">
+        select
+        <include refid="Token_Column"/>
+        from oax.coin c1
+        left join oax.coin c2
+        on ifnull(c1.parent_id,c1.id) = c2.id
+        where c1.contract_address = #{contractAddress}
+
+    </select>
+
+
+    <select id="selectById" resultMap="ResultMapWithBLOBs">
+
+        select
+        <include refid="Token_Column"/>
+        from oax.coin c1
+        left join oax.coin c2
+        on ifnull(c1.parent_id,c1.id) = c2.id
+        where c1.id = #{coinId}
+
+    </select>
+
+    <select id="getCoinByMarketId" parameterType="int" resultType="com.oax.entity.front.Coin">
+        select id,
+        IFNULL(parent_id,id) parentId
+        FROM oax.coin where id =
+        <if test="type==1">
+            (select coin_id from oax.market where id = #{marketId})
+        </if>
+        <if test="type==2">
+            (select mc.coin_id from oax.market m LEFT JOIN oax.market_category mc on mc.id = m.market_category_id where
+            m.id = #{marketId})
+        </if>
+    </select>
+
+    <select id="selectServerIpAndPort" parameterType="int" resultType="com.oax.entity.front.Coin">
+        SELECT id,server_ip,server_port FROM coin where id=(
+            SELECT IFNULL(parent_id,id) FROM coin where id=#{coinId,jdbcType=INTEGER}
+        )
+    </select>
+
+    <select id="selectByPropertyidWithOutCheckCoinId" resultType="com.oax.entity.front.Coin">
+        select
+            <include refid="Base_Column_List"/>
+        from oax.coin
+        <where>
+            <if test="coinId!=null">
+                and id != #{coinId}
+            </if>
+            <if test="propertyid!=null">
+                and propertyid=#{propertyid}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="getShortNameById" resultType="java.lang.String">
+        select short_name from coin where id = #{id}
+    </select>
+
+</mapper>

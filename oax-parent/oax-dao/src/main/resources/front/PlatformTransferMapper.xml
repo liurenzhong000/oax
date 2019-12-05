@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.PlatformTransferMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.PlatformTransfer">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="coin_id" jdbcType="INTEGER" property="coinId" />
+        <result column="from_address" jdbcType="VARCHAR" property="fromAddress" />
+        <result column="to_address" jdbcType="VARCHAR" property="toAddress" />
+        <result column="qty" jdbcType="DECIMAL" property="qty" />
+        <result column="tx_id" jdbcType="VARCHAR" property="txId" />
+        <result column="tx_fee" jdbcType="DECIMAL" property="txFee" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="confirm_time" jdbcType="TIMESTAMP" property="confirmTime" />
+        <result column="gas_price" jdbcType="INTEGER" property="gasPrice" />
+        <result column="gas_limit" jdbcType="INTEGER" property="gasLimit" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, type, coin_id, from_address, to_address, qty, tx_id, tx_fee, status, create_time,
+        update_time, confirm_time, gas_price, gas_limit
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from oax.platform_transfer
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.platform_transfer
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.PlatformTransfer">
+        insert into oax.platform_transfer (id, type, coin_id,
+                                       from_address, to_address, qty,
+                                       tx_id, tx_fee, status,
+                                       create_time, update_time, confirm_time,
+                                       gas_price, gas_limit)
+        values (#{id,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{coinId,jdbcType=INTEGER},
+                                        #{fromAddress,jdbcType=VARCHAR}, #{toAddress,jdbcType=VARCHAR}, #{qty,jdbcType=DECIMAL},
+                                        #{txId,jdbcType=VARCHAR}, #{txFee,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER},
+                                        #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{confirmTime,jdbcType=TIMESTAMP},
+                #{gasPrice,jdbcType=INTEGER}, #{gasLimit,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.PlatformTransfer">
+        insert into oax.platform_transfer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="fromAddress != null">
+                from_address,
+            </if>
+            <if test="toAddress != null">
+                to_address,
+            </if>
+            <if test="qty != null">
+                qty,
+            </if>
+            <if test="txId != null">
+                tx_id,
+            </if>
+            <if test="txFee != null">
+                tx_fee,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="confirmTime != null">
+                confirm_time,
+            </if>
+            <if test="gasPrice != null">
+                gas_price,
+            </if>
+            <if test="gasLimit != null">
+                gas_limit,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="fromAddress != null">
+                #{fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="toAddress != null">
+                #{toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="qty != null">
+                #{qty,jdbcType=DECIMAL},
+            </if>
+            <if test="txId != null">
+                #{txId,jdbcType=VARCHAR},
+            </if>
+            <if test="txFee != null">
+                #{txFee,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="confirmTime != null">
+                #{confirmTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gasPrice != null">
+                #{gasPrice,jdbcType=INTEGER},
+            </if>
+            <if test="gasLimit != null">
+                #{gasLimit,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.PlatformTransfer">
+        update oax.platform_transfer
+        <set>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                coin_id = #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="fromAddress != null">
+                from_address = #{fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="toAddress != null">
+                to_address = #{toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="qty != null">
+                qty = #{qty,jdbcType=DECIMAL},
+            </if>
+            <if test="txId != null">
+                tx_id = #{txId,jdbcType=VARCHAR},
+            </if>
+            <if test="txFee != null">
+                tx_fee = #{txFee,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="confirmTime != null">
+                confirm_time = #{confirmTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gasPrice != null">
+                gas_price = #{gasPrice,jdbcType=INTEGER},
+            </if>
+            <if test="gasLimit != null">
+                gas_limit = #{gasLimit,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.PlatformTransfer">
+        update oax.platform_transfer
+        set type = #{type,jdbcType=INTEGER},
+            coin_id = #{coinId,jdbcType=INTEGER},
+            from_address = #{fromAddress,jdbcType=VARCHAR},
+            to_address = #{toAddress,jdbcType=VARCHAR},
+            qty = #{qty,jdbcType=DECIMAL},
+            tx_id = #{txId,jdbcType=VARCHAR},
+            tx_fee = #{txFee,jdbcType=DECIMAL},
+            status = #{status,jdbcType=INTEGER},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            confirm_time = #{confirmTime,jdbcType=TIMESTAMP},
+            gas_price = #{gasPrice,jdbcType=INTEGER},
+            gas_limit = #{gasLimit,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectNotVerifyByAddressAndType" resultType="com.oax.entity.front.PlatformTransfer">
+
+        select
+        <include refid="Base_Column_List"/>
+        from oax.platform_transfer
+        where from_address = #{address}
+        and status <![CDATA[ = ]]> 1
+    </select>
+    <select id="selectByType" resultType="com.oax.entity.front.PlatformTransfer">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.platform_transfer
+        where type = #{type}
+    </select>
+    <select id="selectByTypeAndStatus" resultType="com.oax.entity.front.PlatformTransfer">
+
+        select
+        <include refid="Base_Column_List"/>
+        from oax.platform_transfer
+        <where>
+            <if test="type!=null">
+                and type = #{type}
+            </if>
+            <if test="status!=null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="selectByHash" resultType="com.oax.entity.front.PlatformTransfer">
+
+        select
+        <include refid="Base_Column_List"/>
+        from oax.platform_transfer
+        where tx_id = #{hash}
+
+    </select>
+
+    <select id="selectByCoinIdAndTime" resultType="com.oax.entity.front.PlatformTransfer">
+        select
+          <include refid="Base_Column_List"/>
+        from oax.platform_transfer
+        where coin_id = #{coinId}
+        and confirm_time >= #{startTime}
+        and #{endTime} >= confirm_time
+    </select>
+
+    <select id="selectByCoinIdAndStatus" resultType="com.oax.entity.front.PlatformTransfer">
+
+        select
+            <include refid="Base_Column_List"/>
+        from oax.platform_transfer
+        <where>
+            <if test="coinId!=null">
+                and coin_id = #{coinId}
+            </if>
+            <if test="type!=null">
+                and type = #{type}
+            </if>
+        </where>
+
+
+    </select>
+    <select id="selectSumVoByCoinIdAndTime" resultType="com.oax.entity.front.vo.PlatformTransferSumVo">
+        select
+        tx_fee
+        from oax.platform_transfer
+        where coin_id = #{coinId}
+        and confirm_time >= #{startTime}
+        and #{endTime} >= confirm_time
+    </select>
+
+</mapper>

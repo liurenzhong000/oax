@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.ArticleMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.Article">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="cn_title" jdbcType="VARCHAR" property="cnTitle"/>
+        <result column="en_title" jdbcType="VARCHAR" property="enTitle"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.oax.entity.front.ArticleWithBLOBs">
+        <result column="cn_content" jdbcType="LONGVARCHAR" property="cnContent"/>
+        <result column="en_content" jdbcType="LONGVARCHAR" property="enContent"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, type, cn_title, en_title, status, create_time, update_time
+    </sql>
+    <sql id="Blob_Column_List">
+        cn_content, en_content
+    </sql>
+
+    <insert id="saveArticle" parameterType="com.oax.entity.admin.param.ArticleSaveParam">
+        insert into oax.article
+        (
+        type, cn_title, en_title, cn_content, en_content, status,
+        read_count, admin_id, release_time, create_time, update_time
+        )
+        values
+        (
+        #{type}, #{cnTitle}, #{enTitle}, #{cnContent}, #{enContent}, #{status},
+        #{readCount}, #{adminId}, #{releaseTime}, #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <select id="noticeManageList" parameterType="com.oax.entity.admin.param.ArticleParam"
+            resultType="com.oax.entity.admin.vo.ArticleListVo">
+        select a.id, a.type, a.cn_title cnTitle, a.en_title enTitle, a.read_count readCount,
+        a.status, a.release_time releaseTime, a.create_time createTime, a.update_time updateTime,
+        u.id adminId, u.name adminName
+        from oax.article a
+        left join oax_admin.user u on a.admin_id = u.id
+        <where>
+            <if test="cnTitle != null and cnTitle != ''">
+                and a.cn_title like concat('%',#{cnTitle},'%')
+            </if>
+            <if test="type != null and type != ''">
+                and a.type = #{type}
+            </if>
+            <if test="status != null and status != ''">
+                and a.status = #{status}
+            </if>
+            <if test="beginTime != null">
+                and a.release_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and a.release_time &lt;= #{endTime}
+            </if>
+        </where>
+        order by
+        a.update_time desc
+    </select>
+
+    <select id="selectTypeList" parameterType="java.util.HashMap" resultType="com.oax.entity.front.ArticleTypeDetail">
+        select a.id,a.type
+        <if test="lang=='cn' ">
+            ,a.cn_title name
+        </if>
+        <if test="lang=='en' ">
+            ,a.en_title name
+        </if>
+        ,a.release_time releaseTime
+        from oax.article a
+        <where>
+            a.status=2
+            <if test="type != null and type != ''">
+                and a.type=#{type,jdbcType=INTEGER}
+            </if>
+        </where>
+        ORDER BY a.release_time desc
+    </select>
+
+    <select id="selectArticleDetail" parameterType="hashMap" resultType="com.oax.entity.front.ArticleDetail">
+        select a.id,a.type,read_count readCount
+        <if test="lang=='cn' ">
+            ,a.cn_content content
+            ,a.cn_title name
+        </if>
+        <if test="lang=='en' ">
+            ,a.en_content content
+            ,a.en_title name
+        </if>
+        ,a.release_time releaseTime
+        from oax.article a
+        <where>
+            and a.status=2
+            <if test="id != null and id != ''">
+                and a.id=#{id,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+
+    <update id="updateArticle" parameterType="com.oax.entity.front.Article">
+        update oax.article a
+        <set>
+            <if test="type != null">
+                a.type = #{type},
+            </if>
+            <if test="cnTitle != null">
+                a.cn_title = #{cnTitle},
+            </if>
+            <if test="enTitle != null">
+                a.en_title = #{enTitle},
+            </if>
+            <if test="cnContent != null">
+                a.cn_content = #{cnContent},
+            </if>
+            <if test="enContent != null">
+                a.en_content = #{enContent},
+            </if>
+            <if test="adminId != null">
+                a.admin_id = #{adminId},
+            </if>
+            <if test="status != null">
+                a.status = #{status},
+            </if>
+            <if test="releaseTime != null">
+                a.release_time = #{releaseTime},
+            </if>
+            <if test="updateTime != null">
+                a.update_time = #{updateTime},
+            </if>
+        </set>
+        where a.id = #{id}
+    </update>
+
+ 	<update id="updateReadCountById" parameterType="java.lang.Integer">
+        update oax.article set read_count=read_count+1
+        
+        where id = #{id}
+    </update>
+    
+    <delete id="deleteNotice" parameterType="int">
+        delete from oax.article
+        where id = #{id}
+    </delete>
+
+    <select id="getArticle" parameterType="int" resultType="com.oax.entity.admin.vo.ArticleVo">
+        select id, type, cn_title cnTitle, en_title enTitle, status, cn_content cnContent,
+        en_content enContent, admin_id adminId, release_time releaseTime, update_time updateTime
+        from oax.article
+        where id = #{id}
+    </select>
+    <select id="selectById" resultType="com.oax.entity.front.Article">
+        select
+            *
+        from oax.article
+        where id = #{id}
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

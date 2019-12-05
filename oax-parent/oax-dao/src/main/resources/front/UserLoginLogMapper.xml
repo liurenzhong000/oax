@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.UserLoginLogMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.UserLoginLog">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="ip" jdbcType="VARCHAR" property="ip"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="source" jdbcType="INTEGER" property="source"/>
+        <result column="login_time" jdbcType="TIMESTAMP" property="loginTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, ip, address, source, login_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_login_log
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_login_log
+        where user_id = #{userId,jdbcType=INTEGER} order by id desc limit 5
+    </select>
+
+    <select id="selectByUserIdOne" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_login_log
+        where user_id = #{userId,jdbcType=INTEGER} order by id desc limit 0,1
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from user_login_log
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByCounts" parameterType="java.lang.Integer">
+		DELETE FROM user_login_log
+		WHERE id NOT IN (
+		SELECT id FROM(SELECT a.id FROM user_login_log a
+		LEFT JOIN user_login_log b ON a.user_id = b.user_id
+		AND a.login_time &lt;= b.login_time
+		GROUP BY a.id,a.user_id,a.ip,a.address,a.source,a.login_time
+		HAVING COUNT(b.id) &lt;=#{counts,jdbcType=INTEGER}
+		)tableA)
+    </delete>
+    
+    <insert id="moveToHistory" parameterType="com.oax.entity.front.ErrorPasswordLog">
+        insert into oax_history.user_login_log (user_id,ip, address,source,login_time)
+		SELECT user_id,ip,address,source,login_time FROM user_login_log WHERE id not in(
+		SELECT a.id FROM user_login_log a
+		LEFT JOIN user_login_log b
+		ON a.user_id=b.user_id AND a.login_time &lt;=b.login_time
+		GROUP BY a.id,a.user_id,a.ip,a.address,a.source,a.login_time
+		HAVING COUNT(b.id) &lt;=#{counts,jdbcType=INTEGER})
+    </insert>
+    
+    <insert id="insert" parameterType="com.oax.entity.front.UserLoginLog">
+        insert into user_login_log (id, user_id, ip,
+        address, source, login_time
+        )
+        values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{ip,jdbcType=VARCHAR},
+        #{address,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER}, #{loginTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.UserLoginLog">
+        insert into user_login_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="ip != null">
+                ip,
+            </if>
+            <if test="address != null">
+                address,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+            <if test="loginTime != null">
+                login_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="ip != null">
+                #{ip,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=INTEGER},
+            </if>
+            <if test="loginTime != null">
+                #{loginTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.UserLoginLog">
+        update user_login_log
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="ip != null">
+                ip = #{ip,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                source = #{source,jdbcType=INTEGER},
+            </if>
+            <if test="loginTime != null">
+                login_time = #{loginTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.UserLoginLog">
+        update user_login_log
+        set user_id = #{userId,jdbcType=INTEGER},
+        ip = #{ip,jdbcType=VARCHAR},
+        address = #{address,jdbcType=VARCHAR},
+        source = #{source,jdbcType=INTEGER},
+        login_time = #{loginTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

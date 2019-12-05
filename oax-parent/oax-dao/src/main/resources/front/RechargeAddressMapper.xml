@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.RechargeAddressMapper">
+  <resultMap id="BaseResultMap" type="com.oax.entity.front.RechargeAddress">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="parent_coin_id" jdbcType="INTEGER" property="parentCoinId" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, parent_coin_id, address, password, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from oax.recharge_address
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from oax.recharge_address
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.oax.entity.front.RechargeAddress">
+    insert into oax.recharge_address (id, user_id, parent_coin_id,
+      address, password, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{parentCoinId,jdbcType=INTEGER}, 
+      #{address,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.oax.entity.front.RechargeAddress">
+    insert into oax.recharge_address
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="parentCoinId != null">
+        parent_coin_id,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="parentCoinId != null">
+        #{parentCoinId,jdbcType=INTEGER},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.RechargeAddress">
+    update oax.recharge_address
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="parentCoinId != null">
+        parent_coin_id = #{parentCoinId,jdbcType=INTEGER},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.RechargeAddress">
+    update oax.recharge_address
+    set user_id = #{userId,jdbcType=INTEGER},
+      parent_coin_id = #{parentCoinId,jdbcType=INTEGER},
+      address = #{address,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+    <select id="selectByCoinType" resultType="com.oax.entity.front.RechargeAddress">
+
+        select
+            ra.id,
+            ra.user_id,
+            ra.parent_coin_id,
+            ra.address,
+            ra.password,
+            ra.create_time,
+            ra.update_time
+        from oax.recharge_address ra
+            left join oax.coin c
+                on ra.parent_coin_id = c.id
+        where c.type = #{type}
+    </select>
+
+    <select id="selectByUserIdAndCoinId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from oax.recharge_address
+        WHERE user_id=#{userId,jdbcType=INTEGER} AND parent_coin_id=(
+        SELECT IFNULL(parent_id,id) FROM coin where id=#{coinId,jdbcType=INTEGER}
+        )
+    </select>
+    <select id="getCount" resultType="int">
+        SELECT COUNT(1) FROM  oax.recharge_address WHERE parent_coin_id = #{parentCoinId} and
+                                                         and user_id = #{userId}
+    </select>
+    <select id="selectByAddress" resultType="com.oax.entity.front.RechargeAddress">
+
+        select
+            <include refid="Base_Column_List"/>
+        from oax.recharge_address
+        where address = #{toAddress}
+
+    </select>
+    <select id="selectByAddressAndParentCoinId" resultType="com.oax.entity.front.RechargeAddress">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.recharge_address
+        where address = #{toAddress}
+        and parent_coin_id = #{parentId}
+
+    </select>
+</mapper>

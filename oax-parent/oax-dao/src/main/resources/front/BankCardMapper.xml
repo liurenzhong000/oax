@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.ctc.BankCardMapper">
+
+    <update id="setDefault" parameterType="map">
+      UPDATE bank_card SET default_card = 1 WHERE user_id = #{userId} AND id = #{id}
+    </update>
+
+    <update id="removeDefault" parameterType="int">
+      UPDATE bank_card SET default_card = 0 WHERE user_id = #{userId}
+    </update>
+
+    <select id="hasBankCard" resultType="boolean" parameterType="int">
+        select count(*) > 0 from bank_card where user_id = #{userId}
+    </select>
+
+    <select id="listByUserId" resultType="com.oax.entity.front.vo.BankCardVo" parameterType="int">
+        SELECT * FROM bank_card WHERE user_id = #{userId} order by default_card desc
+    </select>
+
+    <select id="uniqueCardNo" resultType="boolean" parameterType="string">
+        select count(*) > 0 from bank_card where card_no = #{cardNo}
+    </select>
+    <select id="getDefaultCard" resultType="com.oax.entity.ctc.BankCard">
+        SELECT * FROM bank_card WHERE user_id = #{userId} order by default_card desc limit 1
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

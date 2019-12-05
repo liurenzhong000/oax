@@ -1,0 +1,951 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.UserCoinMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.UserCoin">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="coin_id" jdbcType="INTEGER" property="coinId"/>
+        <result column="banlance" jdbcType="DECIMAL" property="banlance"/>
+        <result column="freezing_banlance" jdbcType="DECIMAL" property="freezingBanlance"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="UserCoinMap" type="com.oax.entity.front.UserCoinInfo">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <id column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="banlance" jdbcType="DECIMAL" property="banlance"/>
+        <result column="freezing_banlance" jdbcType="DECIMAL" property="freezingBanlance"/>
+        <result column="total_banlance" jdbcType="DECIMAL" property="totalBanlance"/>
+        <result column="short_name" jdbcType="VARCHAR" property="shortName"/>
+        <result column="full_name" jdbcType="VARCHAR" property="fullName"/>
+        <result column="image" jdbcType="VARCHAR" property="image"/>
+        <result column="cny_price" jdbcType="DECIMAL" property="cnyPrice"/>
+        <result column="usdt_price" jdbcType="DECIMAL" property="usdtPrice"/>
+        <result column="withdraw_fee" jdbcType="DECIMAL" property="withdrawFee"/>
+        <result column="allow_recharge" jdbcType="INTEGER" property="allowRecharge"/>
+        <result column="allow_withdraw" jdbcType="INTEGER" property="allowWithdraw"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="min_out_qty" jdbcType="DECIMAL" property="minOutQty"/>
+        <result column="max_out_qty" jdbcType="DECIMAL" property="maxOutQty"/>
+    </resultMap>
+
+ 	<resultMap id="UserCoinPriceMap" type="hashMap">
+        <id column="ethPrice" jdbcType="DECIMAL" property="ethPrice"/>
+        <id column="cnyPrice" jdbcType="DECIMAL" property="cnyPrice"/>
+        <id column="usdtPrice" jdbcType="DECIMAL" property="usdtPrice"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, coin_id, banlance, freezing_banlance, create_time,update_time,version
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.user_coin
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByUserIdAndCoinId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.user_coin
+        where user_id = #{userId,jdbcType=INTEGER} and coin_id=#{coinId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectMatchByUserIdAndCoinId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.user_coin
+        where user_id = #{userId,jdbcType=INTEGER} and coin_id=#{coinId,jdbcType=INTEGER} for update
+    </select>
+
+	<select id="selectByUserId" resultMap="UserCoinMap">
+        SELECT a.id,a.short_name,b.user_id,IFNULL(b.banlance,0) banlance,IFNULL(b.freezing_banlance,0) freezing_banlance,IFNULL(b.total_banlance,0) total_banlance,a.full_name,a.withdraw_fee,a.image,a.max_out_qty,a.min_out_qty,
+        a.allow_recharge,a.allow_withdraw,a.type,
+        IFNULL(b.cny_price,0) cny_price,
+        IFNULL(b.usdt_price,0) usdt_price
+        FROM coin a LEFT JOIN  (SELECT id,user_id,banlance,freezing_banlance,total_banlance,full_name,withdraw_fee,image,max_out_qty,min_out_qty,
+        allow_recharge,allow_withdraw,type,
+        (per_cny_price*newPrice*total_banlance) cny_price,
+        (per_usdt_price*newPrice*total_banlance)  usdt_price
+        FROM (SELECT
+        c.id,
+        uc.user_id,
+        IFNULL(uc.banlance, 0) banlance,
+        IFNULL(uc.freezing_banlance, 0) freezing_banlance,
+        IFNULL(uc.banlance + uc.freezing_banlance,0) total_banlance,
+        c.short_name,
+        c.full_name,
+        c.withdraw_fee,
+        c.allow_recharge,
+        c.allow_withdraw,
+        c.type,
+        c.image,
+        c.max_out_qty,
+        c.min_out_qty,
+        (SELECT cny_price FROM market_category WHERE coin_id=(SELECT id FROM coin where type='4')) per_cny_price,
+        (SELECT usdt_price FROM market_category WHERE coin_id=(SELECT id FROM coin where type='1')) per_usdt_price,
+        CASE c.type
+        WHEN '1' THEN IFNULL((SELECT price FROM trade  WHERE  right_coin_id=(SELECT id FROM coin where type='4') AND left_coin_id=(SELECT id FROM coin where type='1')
+        ORDER BY id desc LIMIT 0,1),0)
+        WHEN '2' THEN IFNULL((SELECT price FROM trade  WHERE  right_coin_id=(SELECT id FROM coin where type='4') AND left_coin_id=(SELECT id FROM coin where type='2')
+        ORDER BY id desc LIMIT 0,1),0)
+        WHEN '4' THEN 1
+        ELSE IFNULL((SELECT price FROM trade where id=(SELECT max(id) from  trade where right_coin_id=(SELECT id FROM coin where type='4') AND left_coin_id=c.id)),0) END newPrice
+        FROM user_coin uc LEFT JOIN coin c on c.id = uc.coin_id
+        WHERE (uc.banlance!=0 OR uc.freezing_banlance!=0)
+        AND uc.user_id =#{userId,jdbcType=INTEGER}
+
+        ) TABLEA ORDER BY cny_price desc,banlance desc) b on a.id=b.id
+
+        <if test="coinName != null">
+            where a.short_name LIKE CONCAT(CONCAT('%',#{coinName,jdbcType=VARCHAR}),'%')
+        </if>
+        order by b.cny_price desc
+    </select>
+
+    <select id="listUserCoinByUserId" resultMap="UserCoinMap">
+        SELECT id, user_id, banlance, freezing_banlance, total_banlance
+			, full_name, withdraw_fee, image, max_out_qty, min_out_qty
+			, allow_recharge, allow_withdraw, `type`
+			, per_cny_price * newPrice * total_banlance AS cny_price
+			, per_usdt_price * newPrice * total_banlance AS usdt_price
+            , shortName
+		FROM (
+			SELECT uc.id, uc.user_id, IFNULL(uc.banlance, 0) AS banlance
+				, IFNULL(uc.freezing_banlance, 0) AS freezing_banlance
+				, IFNULL(uc.banlance + uc.freezing_banlance, 0) AS total_banlance
+				, c.short_name, c.full_name, c.withdraw_fee, c.allow_recharge, c.allow_withdraw
+				, c.type, c.image, c.max_out_qty, c.min_out_qty,c.short_name as shortName
+				, (
+					SELECT cny_price
+					FROM market_category
+					WHERE coin_id = (
+						SELECT id
+						FROM coin
+						WHERE TYPE = '1'
+					)
+				) AS per_cny_price
+				, (
+					SELECT usdt_price
+					FROM market_category
+					WHERE coin_id = (
+						SELECT id
+						FROM coin
+						WHERE TYPE = '1'
+					)
+				) AS per_usdt_price
+				, CASE c.type
+					WHEN '1' THEN 1
+					WHEN '2' THEN IFNULL((
+						SELECT 1 / price
+						FROM trade
+						WHERE right_coin_id = (
+								SELECT id
+								FROM coin
+								WHERE TYPE = '2'
+							)
+							AND left_coin_id = (
+								SELECT id
+								FROM coin
+								WHERE TYPE = '1'
+							)
+						ORDER BY id DESC
+						LIMIT 0, 1
+					), 0)
+					WHEN '4' THEN IFNULL((
+						SELECT 1 / price
+						FROM trade
+						WHERE right_coin_id = (
+								SELECT id
+								FROM coin
+								WHERE TYPE = '4'
+							)
+							AND left_coin_id = (
+								SELECT id
+								FROM coin
+								WHERE TYPE = '1'
+							)
+						ORDER BY id DESC
+						LIMIT 0, 1
+					), 0)
+					ELSE IFNULL((
+						SELECT price
+						FROM trade
+						WHERE id = (
+							SELECT MAX(id)
+							FROM trade
+							WHERE right_coin_id = (
+									SELECT id
+									FROM coin
+									WHERE TYPE = '1'
+								)
+								AND left_coin_id = c.id
+						)
+					), 0)
+				END AS newPrice
+			FROM user_coin uc
+				LEFT JOIN coin c ON c.id = uc.coin_id
+			WHERE (uc.banlance != 0
+					OR uc.freezing_banlance != 0)
+				AND uc.user_id = #{userId}
+            <if test="coinName != null">
+                AND c.short_name LIKE CONCAT('%',#{coinName,jdbcType=VARCHAR},'%')
+            </if>
+		) TABLEA
+		ORDER BY cny_price DESC, banlance DESC
+    </select>
+    
+    <select id="selectPropertyByUserIdAndCoinId" resultMap="UserCoinMap">
+     SELECT id,user_id,banlance,freezing_banlance,total_banlance,short_name,full_name,withdraw_fee,image,max_out_qty,min_out_qty,
+     allow_recharge,allow_withdraw,type,
+        IFNULL((per_cny_price*newPrice*total_banlance),0) cny_price,
+        IFNULL((per_usdt_price*newPrice*total_banlance),0)  usdt_price
+        FROM (SELECT
+        c.id,
+        uc.user_id,
+        IFNULL(uc.banlance, 0) banlance,
+        IFNULL(uc.freezing_banlance, 0) freezing_banlance,
+        IFNULL(uc.banlance + uc.freezing_banlance,0) total_banlance,
+        c.short_name,
+        c.full_name,
+		c.withdraw_fee,
+		c.allow_recharge,
+		c.allow_withdraw,
+		c.type,
+        c.image,
+        c.max_out_qty,
+        c.min_out_qty,
+		(SELECT cny_price FROM market_category WHERE coin_id=(SELECT id FROM coin where type='4')) per_cny_price,
+		(SELECT usdt_price FROM market_category WHERE coin_id=(SELECT id FROM coin where type='1')) per_usdt_price,
+		CASE c.type
+         WHEN '1' THEN IFNULL((SELECT price FROM trade  WHERE  right_coin_id=(SELECT id FROM coin where type='4') AND left_coin_id=(SELECT id FROM coin where type='1') AND user_id =#{userId,jdbcType=INTEGER}
+        ORDER BY id desc LIMIT 0,1),0)
+         WHEN '2' THEN IFNULL((SELECT price FROM trade  WHERE  right_coin_id=(SELECT id FROM coin where type='4') AND left_coin_id=(SELECT id FROM coin where type='2') AND user_id =#{userId,jdbcType=INTEGER}
+         ORDER BY id desc LIMIT 0,1),0)
+         WHEN '4' THEN 1
+         ELSE IFNULL((SELECT price FROM trade where id=(SELECT max(id) from  trade where right_coin_id=(SELECT id FROM coin where type='4') AND user_id =#{userId,jdbcType=INTEGER} AND left_coin_id=c.id)),0) END newPrice
+        FROM user_coin uc LEFT JOIN coin c on c.id = uc.coin_id
+        WHERE (uc.banlance!=0 OR uc.freezing_banlance!=0) 
+        AND uc.user_id =#{userId,jdbcType=INTEGER}
+        <if test="coinId != null">
+            and c.id= #{coinId,jdbcType=INTEGER}
+        </if>
+          <if test="coinName != null">
+            and c.short_name LIKE CONCAT(CONCAT('%',#{coinName,jdbcType=VARCHAR}),'%')
+        </if>
+         ) TABLEA ORDER BY cny_price desc,banlance desc
+    </select>
+
+    <select id="selectEthPrice" resultMap="UserCoinPriceMap">
+        SELECT SUM(total_banlance*newPrice)/IFNULL((SELECT price FROM trade  WHERE  right_coin_id=(SELECT id FROM coin where type='4') AND left_coin_id=(SELECT id FROM coin where type='1')
+        ORDER BY id desc LIMIT 0,1),0) ethPrice,
+		SUM(total_banlance*newPrice)*(SELECT cny_price FROM market_category WHERE coin_id=(SELECT id FROM coin where type='4')) cnyPrice,
+		SUM(total_banlance*newPrice)*(SELECT usdt_price FROM market_category WHERE coin_id=(SELECT id FROM coin where type='4')) usdtPrice
+ 		FROM(
+		SELECT
+        c.id,
+        IFNULL(
+        uc.banlance + uc.freezing_banlance,
+        0
+        ) total_banlance,
+		CASE c.type
+         WHEN '1' THEN IFNULL((SELECT price FROM trade  WHERE  right_coin_id=(SELECT id FROM coin where type='4') AND left_coin_id=(SELECT id FROM coin where type='1')
+        ORDER BY id desc LIMIT 0,1),0)
+         WHEN '2' THEN IFNULL((SELECT price FROM trade  WHERE  right_coin_id=(SELECT id FROM coin where type='4') AND left_coin_id=(SELECT id FROM coin where type='2')
+         ORDER BY id desc LIMIT 0,1),0)
+         WHEN '4' THEN  1
+         ELSE IFNULL((SELECT price FROM trade where id=(SELECT max(id) from  trade where right_coin_id=(SELECT id FROM coin where type='4') AND left_coin_id=c.id)),0) END newPrice
+        FROM  user_coin uc LEFT JOIN coin c ON c.id = uc.coin_id     
+        WHERE uc.user_id =#{userId,jdbcType=INTEGER}
+        <if test="coinName != null">
+            and c.short_name LIKE CONCAT(CONCAT('%',#{coinName,jdbcType=VARCHAR}),'%')
+        </if>
+        ) TABLEA
+
+    </select>
+
+	<select id="getLastPriceEthBtc" resultType="java.math.BigDecimal">
+	 SELECT price from  trade where  right_coin_id=(SELECT id FROM coin where type='2') 
+	AND left_coin_id=(SELECT id FROM coin where type='1') ORDER BY id desc LIMIT 0,1
+    </select>
+
+    <select id="getLastPriceUsdtBtc" resultType="java.math.BigDecimal">
+	SELECT price from  trade where  right_coin_id=(SELECT id FROM coin where type='4')
+	AND left_coin_id=(SELECT id FROM coin where type='2') ORDER BY id desc LIMIT 0,1
+    </select>
+
+    <select id="getPrice" resultType="java.math.BigDecimal">
+	 SELECT cny_price FROM market_category WHERE coin_id=(SELECT id FROM coin where type='4')
+    </select>
+    
+    <select id="getLastPriceInEthById" resultType="java.math.BigDecimal">
+	 SELECT  price from  trade  where right_coin_id=(SELECT id FROM coin where type='1') 
+	AND left_coin_id=#{coinId,jdbcType=INTEGER} ORDER BY id desc LIMIT 0,1
+    </select>
+    
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.user_coin
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.oax.entity.front.UserCoin">
+        insert into oax.user_coin (id, user_id, coin_id,
+        address, password, banlance,
+        freezing_banlance, create_time, update_time
+        )
+        values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{coinId,jdbcType=INTEGER},
+        #{address,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{banlance,jdbcType=DECIMAL},
+        #{freezingBanlance,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.UserCoin" keyProperty="id" useGeneratedKeys="true">
+        insert into oax.user_coin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="banlance != null">
+                banlance,
+            </if>
+            <if test="freezingBanlance != null">
+                freezing_banlance,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="banlance != null">
+                #{banlance,jdbcType=DECIMAL},
+            </if>
+            <if test="freezingBanlance != null">
+                #{freezingBanlance,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.UserCoin">
+        update oax.user_coin
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                coin_id = #{coinId,jdbcType=INTEGER},
+            </if>         
+            <if test="banlance != null">
+                banlance = #{banlance,jdbcType=DECIMAL},
+            </if>
+            <if test="freezingBanlance != null">
+                freezing_banlance = #{freezingBanlance,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.UserCoin">
+        update oax.user_coin
+        set user_id = #{userId,jdbcType=INTEGER},
+        coin_id = #{coinId,jdbcType=INTEGER},      
+        banlance = #{banlance,jdbcType=DECIMAL},
+        freezing_banlance = #{freezingBanlance,jdbcType=DECIMAL},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getByUserIdQueryUerCoin" resultMap="BaseResultMap">
+        select a.id, sum(a.banlance+a.freezing_banlance) sum, a.banlance,
+        a.freezing_banlance,
+        (select sum(r.qty) from oax.recharge r where r.user_id = #{user.id}) sumShiftTo,
+        (select sum(w.qty) from oax.withdraw w where w.user_id = #{user.id}) sumShiftOut,
+        (select (wi.qty * wi.fee) as qf from oax.withdraw wi where wi.user_id = #{user.id}) sumFee,
+        (select (t.qty * t.fee) as qfe from oax.orders o left join oax.trade t on o.id = t.order_id where o.user_id =
+        #{user.id}) sumDealFee,
+        c.id `coin.id`,
+        c.short_name `coin.shortName`,
+        u.id `user.id`, u.id_name `user.idname`,
+        u.phone `user.phone`, u.email `user.email`,
+        u.lock_status `user.lockStatus`, u.register_time `user.registerTime`,
+        u.level `user.level`, u.verification_type `user.verificationType`,
+        u.id_no `user.idNo`
+        from oax.user_coin a
+        left join oax.coin c on a.coin_id = c.id
+        left join oax.user u on a.user_id = u.id
+        where a.user_id = #{user.id}
+        <if test="coinSeek!=null and coinSeek!=''">
+            and c.short_name like concat('%',#{coinSeek},'%')
+        </if>
+    </select>
+
+    <resultMap type="java.util.HashMap" id="myMap1">
+        <result column="balance" property="balance"/>
+        <result column="ebalance" property="ebalance"/>
+
+        <result column="coinId" property="coinId"/>
+        <result column="coinName" property="coinName"/>
+        <result column="marketKindCoinId" property="marketKindCoinId"/>
+        <result column="kindName" property="kindName"/>
+        <result column="pricePre" property="pricePre"/>
+        <result column="qtyPre" property="qtyPre"/>
+    </resultMap>
+    <resultMap type="java.util.HashMap" id="myMap2">
+        <result column="id" property="id"/>
+        <result column="marketName" property="marketName"/>
+        <result column="type" property="type"/>
+        <result column="price" property="price"/>
+        <result column="qty" property="qty"/>
+        <result column="tradeQty" property="tradeQty"/>
+        <result column="createTime" property="createTime"/>
+    </resultMap>
+    <select id="getUserCoin" resultType="java.util.HashMap">
+        SELECT
+        IFNULL((SELECT c.banlance
+        from oax.user_coin c
+        where c.user_id = #{userId} and c.coin_id = (SELECT c1.coin_id
+        from oax.market c1
+        where c1.id = #{marketId})), 0)
+        as leftCoinBalance,
+        -- 目标代笔余额
+        IFNULL((SELECT c.banlance
+        from oax.user_coin c
+        where c.user_id = #{userId} and c.coin_id = (select c2.coin_id
+        from oax.market_category c2
+        where c2.id =
+        (SELECT c3.market_category_id
+        from oax.market c3
+        where c3.id = #{marketId}))),
+        0) rightCoinBalance -- 分区币余额
+        from oax.user a
+        where a.id = #{userId}
+    </select>
+
+
+    <select id="getOrdersByUserId" resultType="java.util.HashMap">
+		SELECT  
+			o.id,
+			CONCAT(o.left_coin_name, '/', o.right_coin_name) marketName,
+			o.type,
+			o.price,
+			o.qty,
+			o.trade_qty tradeQty,
+			DATE_FORMAT(o.create_time,'%Y-%m-%d %H:%i:%s') createTime	
+		FROM oax.orders o
+		WHERE 
+		o.market_id = #{marketId} 
+		AND o.user_id = #{userId} 
+		AND o.status IN (0, 1, 2)
+		ORDER BY o.id DESC limit 16
+    </select>
+
+
+    <update id="updateUserCoin" parameterType="com.oax.entity.front.Orders">
+        <!--type=1是买入 -->
+        <if test="type==1">
+            update oax.user_coin a set a.banlance = a.banlance - #{price}*#{qty},
+            a.freezing_banlance = a.freezing_banlance + #{price}*#{qty}
+            where a.coin_id = #{rightCoinId}
+<!--             ( -->
+<!--             select b.coin_id from oax.market a -->
+<!--             LEFT JOIN oax.market_category b on a.market_category_id = b.id -->
+<!--             where a.id = #{marketId} -->
+<!--             ) -->
+            and a.user_id = #{userId}
+        </if>
+        <!--如果是卖出  -->
+        <if test="type==2">
+            update oax.user_coin a set a.banlance = a.banlance - #{qty},
+            a.freezing_banlance = a.freezing_banlance + #{qty}
+            where a.coin_id = #{leftCoinId}
+<!--             ( -->
+<!--             select a.coin_id from oax.market a -->
+<!--             where a.id = #{marketId} -->
+<!--             ) -->
+            and a.user_id = #{userId}
+        </if>
+    </update>
+
+    <select id="selectByAddress" resultType="com.oax.entity.front.UserCoin">
+        select
+        uc.id, uc.user_id, uc.coin_id, uc.banlance, uc.freezing_banlance, uc.create_time,uc.update_time
+        from oax.user_coin uc
+        left join oax.recharge_address ra
+        on uc.user_id = ra.user_id
+        where ra.address = #{toAddress}
+    </select>
+
+    <select id="selectUserCoin" resultType="com.oax.entity.front.UserCoin">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        oax.user_coin
+        WHERE user_id = #{userId}
+        <if test="type==1">
+            AND coin_id = (select mc.coin_id from oax.market m
+            LEFT JOIN oax.market_category mc on mc.id = m.market_category_id
+            where m.id = #{marketId})
+        </if>
+        <if test="type==2">
+            AND coin_id = (SELECT m.coin_id FROM oax.market m where m.id = #{marketId})
+        </if>
+    </select>
+    <!--撮合成功后 修改买家冻结资金 -->
+    <update id="updateBuyerFreezing">
+        UPDATE oax.user_coin
+        SET freezing_banlance = freezing_banlance - #{freezingBanlance}
+        WHERE user_id = #{userId}
+        AND coin_id = #{rightCoinId}
+    </update>
+    <!--撮合成功后 修改买家可用资金 -->
+    <update id="updateBuyerBanlance">
+        UPDATE oax.user_coin
+        SET banlance = banlance + #{banlance}
+        WHERE user_id = #{userId}
+        AND coin_id =  #{leftCoinId}
+    </update>
+    <!--撮合成功后 修改卖家冻结资金 -->
+    <update id="updateSellerFreezing">
+        UPDATE oax.user_coin
+        SET freezing_banlance = freezing_banlance - #{freezingBanlance}
+        WHERE user_id = #{userId}
+        AND coin_id = #{leftCoinId}
+    </update>
+    <update id="updateSellerBanlance">
+        UPDATE oax.user_coin
+        SET banlance = banlance + #{banlance}
+        WHERE user_id = #{userId}
+        AND coin_id = #{rightCoinId}
+    </update>
+	<update id="updateBuyerRightCoinBanlance">
+		UPDATE oax.user_coin
+        SET banlance = banlance + #{banlance}
+        WHERE user_id = #{userId}
+        AND coin_id = #{rightCoinId}
+	</update>
+
+    <select id="selectByCoinType" resultType="com.oax.entity.front.UserCoin">
+        SELECT
+            uc.id,
+            uc.coin_id,
+            uc.address,
+            uc.user_id,
+            uc.banlance,
+            uc.password
+        FROM oax.user_coin uc
+            LEFT JOIN oax.coin c ON uc.coin_id = c.id
+        where c.type = #{type}
+    </select>
+    
+    <select id="getUserCoinRecord" resultType="int">
+		<!--如：X/ETH 如果是买入，查询user_coin 中左币X是否记录 -->
+		SELECT count(1) from oax.user_coin 
+		where user_id = #{userId}
+		and coin_id = 
+    	<if test="type==1">
+    		(SELECT coin_id from oax.market where id = #{marketId})
+    	</if>
+    	
+    	<!--如：X/ETH 如果是卖出，查询user_coin 中右币ETH是否记录 -->
+    	<if test="type==2">
+    		(SELECT mc.coin_id FROM oax.market m LEFT JOIN oax.market_category mc on m.market_category_id = mc.id where m.id = #{marketId})
+    	</if>
+    </select>
+    
+    <select id="getCoinName" resultType="java.lang.String">
+    	select short_name from oax.coin 
+		where id = (SELECT mc.coin_id from oax.market_category mc LEFT JOIN oax.market m on mc.id = m.market_category_id where m.id = #{market})	
+    </select>
+
+    <select id="countAllBanlanceByCoinId" resultType="java.math.BigDecimal">
+        select
+            sum(banlance)+sum(freezing_banlance)
+        from oax.user_coin
+        where coin_id = #{coinId}
+    </select>
+	<select id="getUserCoinByUserIdAndCoinId" resultType="int">
+		select count(1) from oax.user_coin where  user_id =#{userId} and  coin_id = #{coinId}
+	</select>
+
+    <insert id="insertIgnore">
+        insert ignore into oax.user_coin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="banlance != null">
+                banlance,
+            </if>
+            <if test="freezingBanlance != null">
+                freezing_banlance,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="banlance != null">
+                #{banlance,jdbcType=DECIMAL},
+            </if>
+            <if test="freezingBanlance != null">
+                #{freezingBanlance,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="getBanlanceByCoinIdAndUserId" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(banlance), 0) FROM user_coin WHERE coin_id = #{coinId} AND user_id = #{userId}
+    </select>
+
+    <update id="depositByUserIdAndCoinId" parameterType="map">
+        UPDATE
+        user_coin
+        SET banlance = banlance + #{balanceQty},
+        freezing_banlance = freezing_banlance - #{freezingQty}, version = version + 1
+        WHERE coin_id = #{coinId}
+        AND user_id = #{userId}
+        and version = #{version}
+    </update>
+
+    <update id="freezingByUserIdAndCoinId" parameterType="map">
+        UPDATE
+        user_coin
+        SET banlance = banlance - #{freezingQty},
+        freezing_banlance = freezing_banlance + #{freezingQty}, version = version + 1
+        WHERE coin_id = #{coinId}
+        AND user_id = #{userId}
+        and version = #{version}
+    </update>
+
+    <update id="cancelFreezingByUserIdAndCoinId" parameterType="map">
+        UPDATE
+        user_coin
+        SET banlance = banlance + #{cancelFreezingQty},
+        freezing_banlance = freezing_banlance - #{cancelFreezingQty}, version = version + 1
+        WHERE coin_id = #{coinId}
+        AND user_id = #{userId}
+        and version = #{version}
+    </update>
+
+    <update id="addBanlance" parameterType="map">
+        UPDATE
+        user_coin
+        SET banlance = banlance + #{addBanlanceQty}, version = version + 1
+        WHERE coin_id = #{coinId}
+        AND user_id = #{userId}
+        and version = #{version}
+    </update>
+
+    <update id="addFreezing" parameterType="map">
+        UPDATE
+        user_coin
+        SET freezing_banlance = freezing_banlance + #{addFreezingQty}, version = version + 1
+        WHERE coin_id = #{coinId}
+        AND user_id = #{userId}
+        and version = #{version}
+    </update>
+
+    <update id="subtractFreezing" parameterType="map">
+        UPDATE
+        user_coin
+        SET freezing_banlance = freezing_banlance - #{subtractFreezingQty}, version = version + 1
+        WHERE coin_id = #{coinId}
+        AND user_id = #{userId}
+        and version = #{version}
+    </update>
+
+    <select id="selectByCoinId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.user_coin
+        where coin_id = #{coinId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByCoinIdAndCount" resultType="com.oax.entity.front.vo.MemberCoinVo">
+        SELECT
+        u.id,
+        u.from_user_id,
+        uc.banlance
+        FROM
+        `user` u
+        JOIN user_coin uc ON u.id = uc.user_id
+        WHERE uc.coin_id = #{coinId} AND uc.banlance >= #{thresholdBHBCount} and u.id not in (
+          select distinct user_id from user_coin_detail where coin_id = #{coinId} and after_balance <![CDATA[<]]> #{thresholdBHBCount} and create_time > #{startTime} and create_time <![CDATA[<]]> #{endTime}
+          union
+          SELECT DISTINCT user_id FROM user_coin WHERE coin_id = 54 AND create_time > #{endTime}
+        )
+        and u.id not in (1,56441,92891,57449,10149,57450,244263,244266,244940,242648,242725,93677,242883,250378,250379 )
+    </select>
+
+    <select id="selectMemberCoinVoByBonusLog" resultType="com.oax.entity.front.vo.MemberCoinVo">
+        select
+        u.id,
+        u.from_user_id,
+        bl.curr_qty as banlance
+        from
+        `user` u
+        join bonus_log bl on bl.user_id = u.id
+        and bl.create_time > '2018-12-05 20:00:00' and bl.create_time <![CDATA[<]]> '2018-12-05 20:05:00'
+    </select>
+
+    <select id="selectAllUserCoinByUserId" resultType="com.oax.entity.front.UserCoin">
+        select
+        uc.id,
+        ifnull(user_id, #{userId}) as user_id,
+        ifnull(coin_id, c.id) as coin_id,
+        ifnull(banlance, 0) as banlance,
+        ifnull(freezing_banlance, 0) as freezing_banlance
+        from
+        coin c
+        left join user_coin uc on uc.coin_id = c.id  and uc.user_id = #{userId}
+        where 1=1
+        <if test="coinName != null and coinName != ''">
+            and c.short_name LIKE CONCAT(CONCAT('%',#{coinName}),'%')
+        </if>
+    </select>
+
+    <select id="selectUserCoinByUserIdNoZero" resultType="com.oax.entity.front.UserCoin">
+        select
+        uc.*
+        from user_coin uc
+        join coin c on uc.coin_id = c.id
+        where uc.user_id = #{userId}
+        and (uc.banlance != 0 OR uc.freezing_banlance !=0)
+        <if test="coinName != null and coinName != ''">
+            and c.short_name LIKE CONCAT(CONCAT('%',#{coinName}),'%')
+        </if>
+    </select>
+
+    <select id="selectMemberCoinVoByUserCoinSnapshoot" resultType="com.oax.entity.front.vo.MemberCoinVo">
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        user_id AS id,
+        COUNT(user_id) AS counts,
+        AVG(balance) AS banlance,
+        u.from_user_id
+        FROM
+        user_coin_snapshoot ucs
+        JOIN `user` u ON u.id = ucs.user_id
+        WHERE ucs.balance >= 700
+        AND ucs.create_time >= #{snapshootStartTime}
+        AND ucs.create_time <![CDATA[<=]]> #{snapshootEndTime}
+        and u.id not in (SELECT user_id FROM bonus_info)
+        and u.id not in (1,56441,92891,57449,10149,57450,244263,244266,244940,242648,242725,93677,242883, 250378,250379)
+        GROUP BY ucs.user_id
+
+        union
+        SELECT
+        ucs.user_id AS id,
+        COUNT(ucs.user_id) AS counts,
+        AVG(ucs.balance + bi.banlace) AS banlance,
+        u.from_user_id
+        FROM
+        user_coin_snapshoot ucs
+        JOIN `user` u ON u.id = ucs.user_id
+        JOIN bonus_info bi ON u.id = bi.user_id
+        WHERE (ucs.balance + bi.banlace) >= 700
+        AND ucs.create_time >= #{snapshootStartTime}
+        AND ucs.create_time <![CDATA[<=]]> #{snapshootEndTime}
+        GROUP BY ucs.user_id
+        ) t
+        WHERE counts >= 25
+    </select>
+
+    <select id="selectMemberCoinVoByUserCoinSnapshootLightBackup" resultType="com.oax.entity.front.vo.MemberCoinVo">
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        user_id AS id,
+        COUNT(user_id) AS counts,
+        AVG(bonus_balance) AS banlance,
+        u.from_user_id
+        FROM
+        user_coin_snapshoot_light ucsl
+        JOIN `user` u ON u.id = ucsl.user_id
+        WHERE ucsl.bonus_balance >= 700
+        AND ucsl.create_time >= #{snapshootStartTime}
+        AND ucsl.create_time <![CDATA[<=]]> #{snapshootEndTime}
+        AND u.id NOT IN (SELECT user_id FROM bonus_info)
+        AND u.id NOT IN (1,56441,92891,57449,10149,57450,244263,244266,244940,242648,242725,93677,242883, 250378,250379)
+        AND u.id NOT IN (33473,70174,251567,261497,
+        256681,243350,243440,250186,250412,250583,250775,250876,251053,251502,251549,252254,253247,253468,253498,
+        253544,253763,253793,254371,254706,254737,255667,255672,255863,256106,256242,256244,256247,256310,256441,256516,256529,256654,256902,257098,257444,257540,
+        257578,257812,258170,258174,258205,259589,260944,261064,261359,263829,264387,265909,270478,271964,276285,283023,285356,296756,296842,297513,355895,357160,
+        399145,416926,476047,480425,490084,494422,494618,494740,494818,494846,495621,495933,496178,496235,496904,496972,497066,497882,498238,498282,498663,498871,499587,
+        499588,500049,500241,500656,501032,501239,501989,502329,502382,502412,502563,502601,502673,503594,504527,504571,505009,505774,511882,514978,515630,515655,515658,
+        516216,516401,516439,516683,516884,518222,518224,518284,518292,518839,519937,523190,525724,501028,502544,504598,259664,257823,252506,504975,257128,496332,458822,502442,274546,500338,500236,258298,270463,254873,243967,500811,243742)
+        GROUP BY ucsl.user_id
+
+        UNION
+        SELECT
+        ucsl.user_id AS id,
+        COUNT(ucsl.user_id) AS counts,
+        AVG(ucsl.bonus_balance + bi.banlace) AS banlance,
+        u.from_user_id
+        FROM
+        user_coin_snapshoot_light ucsl
+        JOIN `user` u ON u.id = ucsl.user_id
+        JOIN bonus_info bi ON u.id = bi.user_id
+        WHERE (ucsl.bonus_balance + bi.banlace) >= 700
+        AND ucsl.create_time >= #{snapshootStartTime}
+        AND ucsl.create_time <![CDATA[<=]]> #{snapshootEndTime}
+        AND u.id NOT IN (33473,70174,251567,261497,
+        256681,243350,243440,250186,250412,250583,250775,250876,251053,251502,251549,252254,253247,253468,253498,
+        253544,253763,253793,254371,254706,254737,255667,255672,255863,256106,256242,256244,256247,256310,256441,256516,256529,256654,256902,257098,257444,257540,
+        257578,257812,258170,258174,258205,259589,260944,261064,261359,263829,264387,265909,270478,271964,276285,283023,285356,296756,296842,297513,355895,357160,
+        399145,416926,476047,480425,490084,494422,494618,494740,494818,494846,495621,495933,496178,496235,496904,496972,497066,497882,498238,498282,498663,498871,499587,
+        499588,500049,500241,500656,501032,501239,501989,502329,502382,502412,502563,502601,502673,503594,504527,504571,505009,505774,511882,514978,515630,515655,515658,
+        516216,516401,516439,516683,516884,518222,518224,518284,518292,518839,519937,523190,525724,501028,502544,504598,259664,257823,252506,504975,257128,496332,458822,502442,274546,500338,500236,258298,270463,254873,243967,500811,243742)
+        GROUP BY ucsl.user_id
+
+        UNION
+        SELECT
+        user_id AS id,
+        COUNT(user_id) AS counts,
+        AVG(bonus_balance) AS banlance,
+        u.from_user_id
+        FROM
+        user_coin_snapshoot_light ucsl
+        JOIN `user` u ON u.id = ucsl.user_id
+        WHERE 1=1
+        AND ucsl.create_time >= #{snapshootStartTime}
+        AND ucsl.create_time <![CDATA[<=]]> #{snapshootEndTime}
+        AND u.id IN (33473,70174,251567,261497,
+        256681,243350,243440,250186,250412,250583,250775,250876,251053,251502,251549,252254,253247,253468,253498,
+        253544,253763,253793,254371,254706,254737,255667,255672,255863,256106,256242,256244,256247,256310,256441,256516,256529,256654,256902,257098,257444,257540,
+        257578,257812,258170,258174,258205,259589,260944,261064,261359,263829,264387,265909,270478,271964,276285,283023,285356,296756,296842,297513,355895,357160,
+        399145,416926,476047,480425,490084,494422,494618,494740,494818,494846,495621,495933,496178,496235,496904,496972,497066,497882,498238,498282,498663,498871,499587,
+        499588,500049,500241,500656,501032,501239,501989,502329,502382,502412,502563,502601,502673,503594,504527,504571,505009,505774,511882,514978,515630,515655,515658,
+        516216,516401,516439,516683,516884,518222,518224,518284,518292,518839,519937,523190,525724,501028,502544,504598,259664,257823,252506,504975,257128,496332,458822,502442,274546,500338,500236,258298,270463,254873,243967,500811,243742)
+        GROUP BY ucsl.user_id
+        ) t
+        WHERE counts >= 24
+        ORDER BY banlance
+    </select>
+
+    <select id="selectMemberCoinVoByUserCoinSnapshootLight" resultType="com.oax.entity.front.vo.MemberCoinVo">
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        user_id AS id,
+        COUNT(user_id) AS counts,
+        AVG(bonus_balance) AS banlance,
+        u.from_user_id
+        FROM
+        user_coin_snapshoot_light ucsl
+        JOIN `user` u ON u.id = ucsl.user_id
+        WHERE ucsl.bonus_balance >= 700
+        AND ucsl.create_time >= #{snapshootStartTime}
+        AND ucsl.create_time <![CDATA[<=]]> #{snapshootEndTime}
+        and u.id not in (SELECT user_id FROM bonus_info)
+        and u.id not in (1,56441,92891,57449,10149,57450,244263,244266,244940,242648,242725,93677,242883, 250378,250379)
+        GROUP BY ucsl.user_id
+
+        union
+        SELECT
+        ucsl.user_id AS id,
+        COUNT(ucsl.user_id) AS counts,
+        AVG(ucsl.bonus_balance + bi.banlace) AS banlance,
+        u.from_user_id
+        FROM
+        user_coin_snapshoot_light ucsl
+        JOIN `user` u ON u.id = ucsl.user_id
+        JOIN bonus_info bi ON u.id = bi.user_id
+        WHERE (ucsl.bonus_balance + bi.banlace) >= 700
+        AND ucsl.create_time >= #{snapshootStartTime}
+        AND ucsl.create_time <![CDATA[<=]]> #{snapshootEndTime}
+        GROUP BY ucsl.user_id
+        ) t
+        WHERE counts >= 24
+    </select>
+
+    <select id="getLastPriceEthUsdt" resultType="java.math.BigDecimal">
+      SELECT price from  trade where  right_coin_id=(SELECT id FROM coin where type='4')
+      AND left_coin_id=(SELECT id FROM coin where type='1') ORDER BY id desc LIMIT 0,1
+    </select>
+
+    <select id="selectHasRechargeOrCtcByCoinId" resultType="com.oax.entity.front.UserCoin">
+        select
+        uc.*
+        from user_coin uc
+        where uc.coin_id = #{coinId}
+        and (uc.user_id in ( SELECT DISTINCT user_id FROM recharge) or uc.user_id in (SELECT DISTINCT to_user_id FROM ctc_order))
+    </select>
+
+    <select id="getCountBHBORBCB"  resultType="java.math.BigDecimal">
+        SELECT SUM(banlance + freezing_banlance)  FROM  user_coin  WHERE  coin_id = #{coinId,jdbcType=INTEGER}
+    </select>
+
+    <select id="sumByUserIdsAndCoinId" resultType="java.math.BigDecimal">
+        select ifnull(sum(banlance),0) from user_coin where coin_id = #{coinId}
+        and user_id in
+        <foreach collection="userIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="listBCBMemberCoinVos" resultType="com.oax.entity.front.vo.MemberCoinVo">
+        select user_id as id,banlance from  user_coin where coin_id = 66 and banlance >0 and user_id not in (242727,242883,242929)
+    </select>
+
+</mapper>

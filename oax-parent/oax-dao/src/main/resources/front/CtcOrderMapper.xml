@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.ctc.CtcOrderMapper">
+
+    <resultMap id="CtcOrderVoMap" type="com.oax.entity.admin.vo.CtcOrderVo">
+        <result column="type" property="type" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <resultMap id="CtcOrderDetailVoMap" type="com.oax.entity.front.vo.CtcOrderDetailVo">
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="type" property="type" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <resultMap id="CtcOrderForUserVoMap" type="com.oax.entity.front.vo.CtcOrderForUserVo">
+        <result column="type" property="type" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <resultMap id="CtcOrderForMerchantVoMap" type="com.oax.entity.front.vo.CtcOrderForMerchantVo">
+        <result column="type" property="type" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <resultMap id="CtcBuyVoMap" type="com.oax.entity.front.vo.CtcBuyVo">
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <resultMap id="CtcOrderAdminVoMap" type="com.oax.entity.front.vo.CtcOrderAdminVo">
+        <result column="type" property="type" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <select id="getDetailVOById" resultMap="CtcOrderDetailVoMap">
+        SELECT
+        co.id AS ctcOrderId,
+        co.real_name,
+        co.bank_name,
+        co.bank_branch,
+        co.card_no,
+        co.total_cost,
+        co.status,
+        co.type,
+        co.price,
+        co.qty
+        FROM
+        ctc_order co
+        where co.id = #{ctcOrderId}
+        limit 1
+    </select>
+
+    <select id="getCtcBuyVo" resultMap="CtcBuyVoMap">
+        SELECT
+        co.id AS ctcOrderId,
+        bc.real_name,
+        bc.bank_name,
+        bc.card_no,
+        co.total_cost,
+        co.status
+        FROM
+        ctc_order co
+        left JOIN bank_card bc ON co.from_user_id = bc.user_id
+        and bc.default_card = 1
+        where co.id = #{ctcOrderId}
+        limit 1
+    </select>
+
+    <select id="pageForBuy" resultMap="CtcOrderVoMap">
+        SELECT
+        co.id,
+        co.to_user_id AS userId,
+        IFNULL(u.phone, u.email) AS userName,
+        u.id_name,
+        co.from_user_id AS merchantUserId,
+        co.merchant_id,
+        u2.id_name AS merchantIdName,
+        co.qty,
+        co.total_cost,
+        co.price,
+        co.type,
+        co.status,
+        co.create_date,
+        co.finish_date
+        FROM
+        ctc_order co
+        LEFT JOIN `user` u ON u.id = co.to_user_id
+        LEFT JOIN `user` u2 ON u2.id = co.from_user_id
+        where co.type = 0
+        <if test="status != null">and co.status = #{status}</if>
+        <if test="userId != null">and co.to_user_id = #{userId}</if>
+        <if test="userName != null and userName != ''">and u.email = #{userName} or u.phone = #{userName}</if>
+        <if test="merchantId != null">and co.merchant_id = #{merchantId}</if>
+        <if test="startTime != null">and co.create_date >= #{startTime}</if>
+        <if test="endTime != null">and #{endTime} >= co.create_date </if>
+        order by co.create_date desc
+    </select>
+
+    <select id="pageForSale" resultMap="CtcOrderVoMap">
+        select
+        co.id,
+        co.from_user_id as userId,
+        IFNULL(u.phone, u.email ) AS userName,
+        u.id_name,
+        co.to_user_id as merchantUserId,
+        co.merchant_id,
+        u2.id_name AS merchantIdName,
+        co.qty,
+        co.total_cost,
+        co.price,
+        co.type,
+        co.status,
+        co.create_date,
+        co.finish_date
+        from
+        ctc_order co
+        left join `user` u on u.id = co.from_user_id
+        left join `user` u2 on u2.id = co.to_user_id
+        where co.type = 1
+        <if test="status != null">and co.status = #{status}</if>
+        <if test="userId != null">and co.to_user_id = #{userId}</if>
+        <if test="userName != null and userName != ''">and u.email = #{userName} or u.phone = #{userName}</if>
+        <if test="merchantId != null">and co.merchant_id = #{merchantId}</if>
+        <if test="startTime != null">and co.create_date >= #{startTime}</if>
+        <if test="endTime != null">and #{endTime} >= co.create_date </if>
+        order by co.create_date desc
+    </select>
+
+    <select id="pageForUserWeb" resultMap="CtcOrderForUserVoMap">
+        select
+        co.*
+        from ctc_order co
+        join merchant m on co.merchant_id = m.id
+        JOIN `user` u ON u.id = m.user_id
+        where (co.from_user_id = #{userId} or co.to_user_id = #{userId})
+        and u.id != #{userId}
+        <if test="type != null">
+            and co.`type` = #{type}
+        </if>
+        order by co.create_date desc
+
+    </select>
+
+    <select id="pageForMerchantWeb" resultMap="CtcOrderForMerchantVoMap">
+        SELECT
+        co.*
+        FROM ctc_order co
+        JOIN merchant m ON co.merchant_id = m.id
+        JOIN `user` u ON u.id = m.user_id
+        WHERE u.id = #{userId}
+        <if test="type != null">
+            and co.`type` = #{type}
+        </if>
+        ORDER BY co.create_date DESC
+    </select>
+
+    <select id="pageForMerchantManage" resultMap="CtcOrderForMerchantVoMap">
+        select
+        co.*
+        from
+        ctc_order co
+        join merchant m on co.merchant_id = m.id
+        JOIN `user` u ON u.id = m.user_id
+        where co.status IN (0,1,2,3)
+        and u.id = #{userId}
+        <if test="type != null"> AND co.`type` = #{type}</if>
+        order by co.create_date desc
+    </select>
+
+    <select id="getMaxOrderIdByMerchantId" resultType="long">
+        select max(id) from ctc_order where left(id, #{leftLen}) = #{merchantId}
+    </select>
+    <select id="getLastUserBuyOrderMerchantId" resultType="java.lang.Integer">
+        select merchant_id from ctc_order where `type`=0 order by create_date desc limit 1
+    </select>
+    <select id="getLastUserSaleOrderMerchantId" resultType="java.lang.Integer">
+        select merchant_id from ctc_order where `type`=1 order by create_date desc limit 1
+    </select>
+    <select id="countNewOrder" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM ctc_order WHERE (from_user_id = #{userId} OR to_user_id = #{userId}) AND create_date > #{lastRefreshDate}
+    </select>
+
+    <select id="hasNoFinishOrder" resultType="java.lang.Boolean">
+        SELECT IF(COUNT(id)>0,1,0) FROM ctc_order WHERE to_user_id = #{userId} AND `type` = 0 AND 4 > `status`
+    </select>
+    <select id="getLastUserBuyOrderAdvertId" resultType="java.lang.Integer">
+        select ctc_advert_id from ctc_order where `type`=0 order by create_date desc limit 1
+    </select>
+
+    <select id="getLastUserSaleOrderAdvertId" resultType="java.lang.Integer">
+        select ctc_advert_id from ctc_order where `type`=1 order by create_date desc limit 1
+    </select>
+
+    <select id="listFinishByUserId" resultMap="CtcOrderAdminVoMap">
+        select
+        co.id,
+        co.merchant_id,
+        c.short_name as coinName,
+        co.price,
+        co.coin_id,
+        co.qty,
+        co.total_cost,
+        co.type
+        from ctc_order co
+        join merchant m on m.id = co.merchant_id
+        join `user` u on (u.id = co.from_user_id OR u.id = co.to_user_id) AND u.id != m.user_id
+        join coin c on co.coin_id = c.id
+        where u.id = #{userId}
+        and co.status = 4
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

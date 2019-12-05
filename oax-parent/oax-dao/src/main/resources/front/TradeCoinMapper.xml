@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.TradeCoinMapper">
+
+    <select id="findList" resultType="com.oax.entity.front.MarketInfo">
+         SELECT
+	        a.id marketId,
+	        c.id coinId,
+	        d.id marketCoinId,
+	        c.short_name coinName,
+	        d.short_name marketCoinName,
+	        a.price_decimals priceDecimals,
+	        a.qty_decimals qtyDecimals,
+	        b.cny_price cnyPrice,
+	        IFNULL(e.maxPrice,0) maxPrice,
+	        IFNULL(e.minPrice,0) minPrice,
+	        IFNULL(e.sumQty,0) tradeQty, -- tradeNum
+	        IFNULL(e.totalAmount,0) totalAmount, -- total
+	        IFNULL(h.last_tradePrice,0) lastTradePrice, -- tradePrice
+	        ROUND(IFNULL((g.24h_end_tradePrice-f.24h_begin_tradePrice)*100/f.24h_begin_tradePrice,0),2) incRate,
+	        c.image coinImage,
+	        c.full_name fullCoinName
+		FROM market a
+        JOIN market_category b ON a.market_category_id = b.id
+        JOIN coin c ON a.coin_id = c.id
+        JOIN coin d ON b.coin_id = d.id
+        LEFT JOIN(
+	        SELECT market_id, MAX(price) maxPrice,MIN(price) minPrice,SUM(price*qty) totalAmount,SUM(qty) sumQty
+	        FROM trade FORCE INDEX(idx_trade_create_time) where create_time >=NOW() - interval 1 DAY GROUP BY market_id
+        ) e on e.market_id=a.id
+        LEFT JOIN(
+	        SELECT t1.market_id, t1.price 24h_begin_tradePrice
+	        FROM trade t1
+					JOIN ( SELECT MIN(id) id from trade FORCE INDEX(idx_trade_create_time) WHERE create_time >=NOW() - interval 1 DAY GROUP BY market_id ) f1
+					ON f1.id = t1.id
+        ) f on f.market_id=a.id
+        LEFT JOIN(
+	        SELECT t2.market_id, t2.price 24h_end_tradePrice
+	        FROM trade t2
+	        JOIN( SELECT MAX(id) ID from trade FORCE INDEX(idx_trade_create_time) WHERE create_time >=NOW() - interval 1 DAY GROUP BY market_id ) f2
+					ON f2.id = t2.id
+        ) g on g.market_id=a.id
+
+        LEFT JOIN(
+	        SELECT t3.market_id, t3.price last_tradePrice
+	        FROM trade t3
+	        JOIN ( SELECT MAX(id) id from trade GROUP BY market_id ) f3
+					ON f3.id = t3.id
+        ) h on h.market_id=a.id
+		WHERE b.is_use =1 and a.is_show=1 GROUP BY a.id order by b.sort_num , a.sort_num
+    </select>
+</mapper>

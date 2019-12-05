@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.activity.PanicBuyDetailMapper">
+
+    <select id="getCanBuyDetail" resultType="com.oax.entity.activity.PanicBuyDetail">
+        select * from panic_buy_detail where user_id = #{userId} and status = 1 and valid_time >= now() order by id desc limit 1
+    </select>
+
+    <select id="participated" resultType="java.lang.Boolean">
+        select IF(count(*)>0,1,0) from panic_buy_detail where user_id = #{userId} and activity_id = #{activityId}
+    </select>
+
+    <select id="reached" resultType="java.lang.Boolean">
+        select IF(count(*)>0,1,0) from panic_buy_detail where user_id = #{userId} and activity_id = #{activityId} and status = 1
+    </select>
+
+    <select id="selectByUserIdAndActivityId" resultType="com.oax.entity.activity.PanicBuyDetail">
+        select * from panic_buy_detail where user_id = #{userId} and activity_id = #{activityId}
+    </select>
+
+    <select id="pageForAdmin" resultType="com.oax.entity.activity.PanicBuyDetail">
+        select
+        *
+        from
+        panic_buy_detail
+        where 1=1
+        <if test="activityId != null">
+            and activity_id = #{activityId}
+        </if>
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        order by id desc
+    </select>
+
+    <update id="updateReachUser">
+        update panic_buy_detail set qty = 100,remain_qty = 100,valid_time = #{validTime}
+        where activity_id = #{activityId} and help_value >= 100 and `status` = 1
+    </update>
+
+</mapper>

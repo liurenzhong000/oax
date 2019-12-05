@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.BonusMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.Bonus">
+        <id column="id" property="id" />
+        <result column="from_user_id" property="fromUserId" />
+        <result column="to_user_id" property="toUserId" />
+        <result column="threshold_number" property="thresholdNumber" />
+        <result column="average_threshold" property="averageThreshold" />
+        <result column="hierarchy" property="hierarchy" />
+        <result column="bonus" property="bonus" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, from_user_id, to_user_id, threshold_number, average_threshold,hierarchy, bonus, create_time
+    </sql>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into bonus (from_user_id, to_user_id, threshold_number, average_threshold, hierarchy,bonus,left_coin_id,right_coin_id,my_average_threshold, level_average_threshold) values
+        <foreach collection="list" item="item" index="index"  separator=",">
+            (
+            #{item.fromUserId},
+            #{item.toUserId},
+            #{item.thresholdNumber},
+            #{item.averageThreshold},
+            #{item.hierarchy},
+            #{item.bonus},
+            #{item.leftCoinId},
+            #{item.rightCoinId},
+            #{item.myAverageThreshold},
+            #{item.levelAverageThreshold}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

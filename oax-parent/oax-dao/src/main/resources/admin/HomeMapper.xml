@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.admin.HomeMapper">
+
+
+    <select id="countHomeStatistics" resultType="com.oax.entity.admin.vo.HomeStatisticsVo">
+        SELECT
+        (SELECT COUNT(id)
+        FROM oax.user register_time
+        WHERE register_time <![CDATA[<=]]> #{tomorrowStart} AND register_time >= #{todayStart}) `usersCountVo.countUserRegister`,
+
+        (SELECT COUNT(id)
+        FROM oax.user)                                 `usersCountVo.countAllUser`,
+
+        (SELECT COUNT(DISTINCT user_id)
+        FROM oax.user_login_log
+        WHERE login_time <![CDATA[<=]]> #{tomorrowStart} AND login_time >= #{todayStart})    `usersCountVo.countActiveUser`,
+
+        (SELECT COUNT(DISTINCT user_id)
+        FROM oax.user_coin)                            `usersCountVo.countHasCoinUser`,
+
+        (SELECT COUNT(DISTINCT user_id)
+        FROM oax.recharge
+        WHERE create_time <![CDATA[<=]]> #{tomorrowStart} AND create_time >= #{todayStart})   `usersCountVo.countRechargeUser`,
+
+        (SELECT COUNT(DISTINCT user_id)
+        FROM oax.withdraw
+        WHERE create_time <![CDATA[<=]]> #{tomorrowStart} AND create_time >= #{todayStart})   `usersCountVo.countWithdrawUser`,
+
+        (SELECT COUNT(DISTINCT user_id)
+        FROM oax.orders
+        WHERE create_time <![CDATA[<=]]> #{tomorrowStart} AND create_time >= #{todayStart})   `usersCountVo.countOrderUser`,
+
+
+        (SELECT COUNT(DISTINCT user_id)
+        FROM oax.user_login_log
+        WHERE
+        source = 1
+        AND
+        login_time <![CDATA[<=]]> #{tomorrowStart} AND login_time >= #{todayStart})      `usersCountVo.countPcUser`,
+        (SELECT COUNT(DISTINCT user_id)
+        FROM oax.user_login_log
+        WHERE
+        source = 2
+        AND
+        login_time <![CDATA[<=]]> #{tomorrowStart} AND login_time >= #{todayStart})      `usersCountVo.countIosUser`,
+        (SELECT COUNT(DISTINCT user_id)
+        FROM oax.user_login_log
+        WHERE
+        source = 3
+        AND
+        login_time <![CDATA[<=]]> #{tomorrowStart} AND login_time >= #{todayStart})      `usersCountVo.countAndroidUser`,
+
+        (SELECT COUNT(id)
+        FROM oax.trade
+        WHERE create_time <![CDATA[<=]]> #{tomorrowStart} AND create_time >= #{todayStart})   `ordersCountVo.successOrders`,
+
+        ( SELECT COUNT(id)
+        FROM oax.orders
+        WHERE create_time <![CDATA[<=]]> #{tomorrowStart} AND create_time >= #{todayStart})   `ordersCountVo.countOrders`,
+
+        (SELECT COUNT(id)
+        FROM oax.orders
+        WHERE
+        STATUS = -1
+        AND
+        create_time <![CDATA[<=]]> #{tomorrowStart} AND create_time >= #{todayStart})     `ordersCountVo.countRepealOrders`,
+
+        (SELECT COUNT(id)
+        FROM oax.recharge
+        WHERE
+        create_time <![CDATA[<=]]> #{tomorrowStart} AND create_time >= #{todayStart})     `ordersCountVo.countRecharge`,
+
+        (SELECT COUNT(id)
+        FROM oax.withdraw
+        WHERE
+        create_time <![CDATA[<=]]> #{tomorrowStart} AND create_time >= #{todayStart})     `ordersCountVo.countWithdraw`;
+        
+    </select>
+</mapper>

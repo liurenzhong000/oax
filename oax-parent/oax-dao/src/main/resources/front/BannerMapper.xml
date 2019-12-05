@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.BannerMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.Banner">
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.oax.entity.front.Banner">
+        insert into oax.banner
+        (type, title, cn_image, en_image, url, status, create_time, update_time, admin_id, sort_no)
+        values
+        (#{type}, #{title}, #{cnImage}, #{enImage}, #{url}, #{status}, #{createTime}, #{updateTime}, #{adminId},
+        #{sortNo})
+    </insert>
+
+    <update id="update" parameterType="com.oax.entity.admin.param.BannerUpdateParam" flushCache="false">
+        update oax.banner
+        <set>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="cnImage != null">
+                cn_image = #{cnImage},
+            </if>
+            <if test="enImage != null">
+                en_image = #{enImage},
+            </if>
+            <if test="sortNo != null">
+                sort_no = #{sortNo},
+            </if>
+            <if test="adminId != null">
+                admin_id = #{adminId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="url != null">
+                url = #{url},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="bannerManageList" parameterType="com.oax.entity.admin.param.BannerParam"
+            resultType="com.oax.entity.admin.vo.BannerVo">
+        select b.id, b.type, b.title, b.cn_image cnImage, b.en_image enImage, b.url, b.status, b.sort_no sortNo, u.name
+        adminName
+        from oax.banner b
+        left join oax_admin.user u on b.admin_id = u.id
+        <where>
+            <if test="type != null">
+                and b.type = #{type}
+            </if>
+            <if test="status != null">
+                and b.status = #{status}
+            </if>
+            <if test="beginTime != null">
+                and b.create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and b.create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY b.sort_no ASC
+    </select>
+
+    <delete id="deleteBanner" parameterType="int">
+        delete from oax.banner
+        where id = #{id}
+    </delete>
+    <select id="findList" parameterType="java.util.HashMap" resultType="com.oax.entity.front.BannerInfo">
+        select
+        id,
+        title,
+        <if test="lang=='cn'">
+            cn_image image,
+        </if>
+        <if test="lang=='en'">
+            en_image image,
+        </if>
+        url
+        from oax.banner
+        where status = 2
+        and type = #{type}
+        ORDER BY sort_no limit 5
+    </select>
+    <select id="selectById" resultType="com.oax.entity.front.Banner">
+        select
+            *
+        from oax.banner
+        where id = #{id}
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

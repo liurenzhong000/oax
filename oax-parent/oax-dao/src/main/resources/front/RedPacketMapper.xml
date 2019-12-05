@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.RedPacketMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.RedPacket">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="coin_id" jdbcType="INTEGER" property="coinId" />
+        <result column="coin_name" jdbcType="VARCHAR" property="coinName" />
+        <result column="total_coin_qty" jdbcType="DECIMAL" property="totalCoinQty" />
+        <result column="total_cny" jdbcType="DECIMAL" property="totalCny" />
+        <result column="total_packet_qty" jdbcType="INTEGER" property="totalPacketQty" />
+        <result column="wish_words" jdbcType="VARCHAR" property="wishWords" />
+        <result column="grab_coin_qty" jdbcType="DECIMAL" property="grabCoinQty" />
+        <result column="grab_packet_qty" jdbcType="INTEGER" property="grabPacketQty" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, type, coin_id, coin_name, total_coin_qty, total_cny, total_packet_qty,
+        wish_words, grab_coin_qty, grab_packet_qty, create_time, expire_time, update_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from oax.red_packet
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.red_packet
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.oax.entity.front.RedPacket">
+        insert into oax.red_packet (user_id, type,
+                                coin_id, coin_name, total_coin_qty,
+                                total_cny, total_packet_qty, wish_words,
+                                grab_coin_qty, grab_packet_qty, create_time,
+                                expire_time, update_time,is_refund)
+        values (#{userId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER},
+                                        #{coinId,jdbcType=INTEGER}, #{coinName,jdbcType=VARCHAR}, #{totalCoinQty,jdbcType=DECIMAL},
+                                        #{totalCny,jdbcType=DECIMAL}, #{totalPacketQty,jdbcType=INTEGER}, #{wishWords,jdbcType=VARCHAR},
+                                        #{grabCoinQty,jdbcType=DECIMAL}, #{grabPacketQty,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+                #{expireTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},#{isRefund,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.RedPacket">
+        insert into oax.red_packet
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="coinName != null">
+                coin_name,
+            </if>
+            <if test="totalCoinQty != null">
+                total_coin_qty,
+            </if>
+            <if test="totalCny != null">
+                total_cny,
+            </if>
+            <if test="totalPacketQty != null">
+                total_packet_qty,
+            </if>
+            <if test="wishWords != null">
+                wish_words,
+            </if>
+            <if test="grabCoinQty != null">
+                grab_coin_qty,
+            </if>
+            <if test="grabPacketQty != null">
+                grab_packet_qty,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="expireTime != null">
+                expire_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="coinName != null">
+                #{coinName,jdbcType=VARCHAR},
+            </if>
+            <if test="totalCoinQty != null">
+                #{totalCoinQty,jdbcType=DECIMAL},
+            </if>
+            <if test="totalCny != null">
+                #{totalCny,jdbcType=DECIMAL},
+            </if>
+            <if test="totalPacketQty != null">
+                #{totalPacketQty,jdbcType=INTEGER},
+            </if>
+            <if test="wishWords != null">
+                #{wishWords,jdbcType=VARCHAR},
+            </if>
+            <if test="grabCoinQty != null">
+                #{grabCoinQty,jdbcType=DECIMAL},
+            </if>
+            <if test="grabPacketQty != null">
+                #{grabPacketQty,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="expireTime != null">
+                #{expireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.RedPacket">
+        update oax.red_packet
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                coin_id = #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="coinName != null">
+                coin_name = #{coinName,jdbcType=VARCHAR},
+            </if>
+            <if test="totalCoinQty != null">
+                total_coin_qty = #{totalCoinQty,jdbcType=DECIMAL},
+            </if>
+            <if test="totalCny != null">
+                total_cny = #{totalCny,jdbcType=DECIMAL},
+            </if>
+            <if test="totalPacketQty != null">
+                total_packet_qty = #{totalPacketQty,jdbcType=INTEGER},
+            </if>
+            <if test="wishWords != null">
+                wish_words = #{wishWords,jdbcType=VARCHAR},
+            </if>
+            <if test="grabCoinQty != null">
+                grab_coin_qty = #{grabCoinQty,jdbcType=DECIMAL},
+            </if>
+            <if test="grabPacketQty != null">
+                grab_packet_qty = #{grabPacketQty,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="expireTime != null">
+                expire_time = #{expireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.RedPacket">
+        update oax.red_packet
+        set user_id = #{userId,jdbcType=INTEGER},
+            type = #{type,jdbcType=INTEGER},
+            coin_id = #{coinId,jdbcType=INTEGER},
+            coin_name = #{coinName,jdbcType=VARCHAR},
+            total_coin_qty = #{totalCoinQty,jdbcType=DECIMAL},
+            total_cny = #{totalCny,jdbcType=DECIMAL},
+            total_packet_qty = #{totalPacketQty,jdbcType=INTEGER},
+            wish_words = #{wishWords,jdbcType=VARCHAR},
+            grab_coin_qty = #{grabCoinQty,jdbcType=DECIMAL},
+            grab_packet_qty = #{grabPacketQty,jdbcType=INTEGER},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            expire_time = #{expireTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="countRedPacketByParam" resultType="com.oax.entity.admin.dto.CountRedPacketDto">
+
+        select
+        (
+        select
+        sum(rp.total_coin_qty)
+        from oax.red_packet rp
+        left join oax.user u on u.id = rp.user_id
+        <where>
+            <if test="coinId != null">
+                and rp.coin_id = #{coinId}
+            </if>
+            <if test="userId != null">
+                and rp.user_id = #{userId}
+            </if>
+            <if test="username != null">
+                and (u.phone like concat('%',#{username},'%') or u.email like concat('%',#{username},'%'))
+            </if>
+            <if test="type != null">
+                and rp.type = #{type}
+            </if>
+        </where>
+        ) `totalCny`,
+        (
+        select
+        sum(rp.total_coin_qty / rp.total_coin_qty * rp.grab_coin_qty)
+        from oax.red_packet rp
+        left join oax.user u on u.id = rp.user_id
+        <where>
+            <if test="coinId != null">
+                and rp.coin_id = #{coinId}
+            </if>
+            <if test="userId != null">
+                and rp.user_id = #{userId}
+            </if>
+            <if test="username != null">
+                and (u.phone like concat('%',#{username},'%') or u.email like concat('%',#{username},'%'))
+            </if>
+            <if test="type != null">
+                and rp.type = #{type}
+            </if>
+        </where>
+        ) `grabCny`,
+        (
+        select
+        sum(rp.total_coin_qty - rp.total_coin_qty / rp.total_coin_qty * rp.grab_coin_qty)
+        from oax.red_packet rp
+        left join oax.user u on u.id = rp.user_id
+        <where>
+            <if test="coinId != null">
+                and rp.coin_id = #{coinId}
+            </if>
+            <if test="userId != null">
+                and rp.user_id = #{userId}
+            </if>
+            <if test="username != null">
+                and (u.phone like concat('%',#{username},'%') or u.email like concat('%',#{username},'%'))
+            </if>
+            <if test="type != null">
+                and rp.type = #{type}
+            </if>
+            and current_timestamp>rp.expire_time
+        </where>
+        ) `returnCny`
+
+    </select>
+    <select id="selectRedPacketByPageParam" resultType="com.oax.entity.admin.vo.RedPacketVo">
+        select
+        rp.*,
+        u.email      `email`,
+        u.phone      `phone`
+        from oax.red_packet rp
+        left join oax.user u on u.id = rp.user_id
+
+        <where>
+            <if test="coinId != null">
+                and rp.coin_id = #{coinId}
+            </if>
+            <if test="userId != null">
+                and rp.user_id = #{userId}
+            </if>
+            <if test="username != null">
+                and (u.phone like concat('%',#{username},'%') or u.email like concat('%',#{username},'%'))
+            </if>
+            <if test="type != null">
+                and rp.type = #{type}
+            </if>
+        </where>
+        order by rp.create_time desc
+    </select>
+    <select id="selectRedPacketVoById" resultType="com.oax.entity.admin.vo.RedPacketVo">
+        select
+            rp.*,
+            u.email      `email`,
+            u.phone      `phone`
+        from oax.red_packet rp
+            left join oax.user u on rp.user_id = u.id
+
+        where rp.id = #{redPacketId}
+    </select>
+    <select id="selectRedPacketVoByUserIdId" resultType="com.oax.entity.admin.vo.RedPacketVo">
+
+        select
+            rp.*,
+            u.email      `email`,
+            u.phone      `phone`
+        from oax.red_packet rp
+            left join oax.user u on rp.user_id = u.id
+
+        where rp.user_id = #{userId}
+
+    </select>
+
+
+    <select id="getBanlance" resultType="java.math.BigDecimal">
+        select banlance from oax.user_coin  where coin_id = #{coinId} and user_id = #{userId}
+    </select>
+    <select id="getLimit" resultType="com.oax.entity.front.RedPacketLimit">
+        SELECT
+          r.id,r.type,
+          r.coin_id coinId,
+          c.short_name coinName,
+          r.limit_coin_qty limitCoinQty,
+          r.limit_packet_qty limitPacketQty
+        FROM oax.red_packet_limit r
+        LEFT JOIN oax.coin c on c.id = r.coin_id
+  </select>
+    <select id="getCnyPrice" resultType="java.math.BigDecimal" parameterType="integer">
+    SELECT
+    (CASE WHEN type=1 THEN 1
+         WHEN type=2 THEN IFNULL((SELECT 1/price FROM oax.trade WHERE right_coin_id=(SELECT id FROM coin where type=2) AND left_coin_id=(SELECT id FROM coin WHERE type=1)
+                        ORDER BY id DESC LIMIT 1),0)
+             ELSE IFNULL((SELECT price FROM  trade WHERE right_coin_id=(SELECT id FROM coin where type='1')
+            AND left_coin_id=c.id ORDER BY id DESC LIMIT 1),0)
+            END)*(SELECT cny_price FROM oax.market_category where coin_id = (SELECT id from oax.coin where type=1))
+    from oax.coin c  where id = #{coinId}
+  </select>
+    <select id="getUserCoinRecord" resultType="java.lang.Integer">
+      SELECT count(1) from oax.user_coin
+		where user_id = #{userId}
+		and coin_id = #{coinId}
+  </select>
+    <select id="getRedPacketById" resultType="com.oax.entity.front.RedPacket" parameterType="integer">
+      SELECT
+        r.id,
+        r.user_id userId,
+		IFNULL(SUBSTR(u.phone,5),u.email) accountNumber,
+        r.coin_name coinName,
+        r.type,
+        r.coin_id coinId,
+        r.total_coin_qty totalCoinQty,
+        r.total_cny totalCny,
+        r.total_packet_qty totalPacketQty,
+        r.grab_coin_qty grabCoinQty,
+        r.grab_packet_qty grabPacketQty,
+        r.wish_words wishWords,
+        r.expire_time expireTime
+      from oax.red_packet r
+    LEFT JOIN oax.user u on u.id = r.user_id
+    where r.id = #{id}
+  </select>
+    <select id="checkTakeRedPacket" resultType="java.util.Map">
+     SELECT
+     IFNULL(SUBSTR(u.phone,5),u.email) accountNumber,
+     g.coin_name coinName,
+     g.coin_qty coinQty,
+     r.wish_words wishWords
+    from oax.grab_red_packet_log g
+    LEFT JOIN oax.red_packet r on r.id = g.red_packet_id
+    LEFT JOIN oax.user u on u.id  = r.user_id
+    where g.user_id = #{userId} and g.red_packet_id = #{redPacketId}
+  </select>
+
+
+    <update id="updateUserCoin" parameterType="com.oax.entity.front.RedPacket">
+    update oax.user_coin
+    set banlance = banlance - #{totalCoinQty}
+    where user_id = #{userId} and coin_id = #{coinId}
+  </update>
+    <insert id="insertUserSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.oax.entity.front.Member">
+        insert into oax.user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="transactionPassword != null">
+                transaction_password,
+            </if>
+            <if test="verificationType != null">
+                verification_type,
+            </if>
+            <if test="lockStatus != null">
+                lock_status,
+            </if>
+            <if test="checkStatus != null">
+                check_status,
+            </if>
+            <if test="idName != null">
+                id_name,
+            </if>
+            <if test="idNo != null">
+                id_no,
+            </if>
+            <if test="idImageA != null">
+                id_image_a,
+            </if>
+            <if test="idImageB != null">
+                id_image_b,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="fromUserId != null">
+                from_user_id,
+            </if>
+            <if test="registerTime != null">
+                register_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+            <if test="emailStatus != null">
+                email_status,
+            </if>
+
+            <if test="phoneStatus != null">
+                phone_status,
+            </if>
+            <if test="googleStatus != null">
+                google_status,
+            </if>
+            <if test="country!= null">
+                country,
+            </if>
+            <if test="googleKey!= null">
+                google_key,
+            </if>
+            <if test="registerType!= null">
+                register_type,
+            </if>
+            <if test="type!= null">
+                type,
+            </if>
+            <if test="apiKey!= null">
+                api_key,
+            </if>
+            <if test="needTransactionPassword!= null">
+                need_transaction_password,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="transactionPassword != null">
+                #{transactionPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="verificationType != null">
+                #{verificationType,jdbcType=INTEGER},
+            </if>
+            <if test="lockStatus != null">
+                #{lockStatus,jdbcType=INTEGER},
+            </if>
+            <if test="checkStatus != null">
+                #{checkStatus,jdbcType=INTEGER},
+            </if>
+            <if test="idName != null">
+                #{idName,jdbcType=VARCHAR},
+            </if>
+            <if test="idNo != null">
+                #{idNo,jdbcType=VARCHAR},
+            </if>
+            <if test="idImageA != null">
+                #{idImageA,jdbcType=VARCHAR},
+            </if>
+            <if test="idImageB != null">
+                #{idImageB,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="fromUserId != null">
+                #{fromUserId,jdbcType=INTEGER},
+            </if>
+            <if test="registerTime != null">
+                #{registerTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="level != null">
+                #{level,jdbcType=INTEGER},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=INTEGER},
+            </if>
+
+            <if test="emailStatus != null">
+                #{emailStatus,jdbcType=INTEGER},
+            </if>
+
+            <if test="phoneStatus != null">
+                #{phoneStatus,jdbcType=INTEGER},
+            </if>
+            <if test="googleStatus != null">
+                #{googleStatus,jdbcType=INTEGER},
+            </if>
+            <if test="country != null">
+                #{country,jdbcType=VARCHAR},
+            </if>
+            <if test="googleKey != null">
+                #{googleKey,jdbcType=VARCHAR},
+            </if>
+            <if test="registerType != null">
+                #{registerType,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="apiKey != null">
+                #{apiKey,jdbcType=VARCHAR},
+            </if>
+            <if test="needTransactionPassword != null">
+                #{needTransactionPassword,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertLogs" parameterType="com.oax.entity.front.GrabRedPacketLog">
+      insert oax.grab_red_packet_log
+      (user_id,
+      red_packet_id,
+      coin_qty,cny,
+      sources,
+      coin_id,
+      coin_name,
+      create_time)
+      VALUES
+      (
+      #{userId,jdbcType=INTEGER},
+      #{redPacketId,jdbcType=INTEGER},
+      #{coinQty,jdbcType=DECIMAL},
+      #{cny,jdbcType=DECIMAL},
+      #{sources,jdbcType=VARCHAR},
+      #{coinId,jdbcType=INTEGER},
+      #{coinName,jdbcType=VARCHAR},
+      #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+    <update id="addUserCoin">
+      update oax.user_coin set banlance = banlance + #{banlance}
+      where user_id = #{userId} and coin_id = #{coinId}
+  </update>
+    <update id="updateRedPacket">
+         UPDATE oax.red_packet
+        set
+            grab_coin_qty = grab_coin_qty + #{grabCoinQty},
+            grab_packet_qty = grab_packet_qty +1,
+            update_time= now()
+        where id = #{id} and total_packet_qty>grab_packet_qty
+    </update>
+
+    <select id="findRedPacketPageByUserId" resultType="com.oax.entity.front.RedPacketRecord" parameterType="integer">
+        SELECT
+            id,
+            coin_id coinId,
+            coin_name coinName,
+            type,
+            total_coin_qty totalCoinQty,
+            total_cny totalCny,
+            total_packet_qty totalPacketQty,
+            grab_packet_qty grabPacketQty,
+            if(total_coin_qty-grab_coin_qty,0,1) takeFlag,
+            case WHEN expire_time > NOW() then 0
+            else 1
+            end expireFlag,
+            create_time createTime
+        FROM
+            oax.red_packet
+        where user_id = #{userId} ORDER BY id desc
+    </select>
+    <select id="getSumCnyByUserId" resultType="java.math.BigDecimal" parameterType="integer">
+        SELECT SUM(total_cny) FROM oax.red_packet where user_id = #{userId}
+    </select>
+    <select id="getRedPacketInfo" resultType="java.util.Map" parameterType="int">
+        SELECT
+            coin_name coinName,
+            user_id userId,
+            type,
+            total_coin_qty totalCoinQty,
+            total_packet_qty totalPacketQty,
+            grab_packet_qty grabPacketQty,
+            grab_coin_qty grabCoinQty,
+            (total_coin_qty-grab_coin_qty) surplusCoinQty,
+            if(total_coin_qty-grab_coin_qty,0,1) takeFlag,
+            case WHEN expire_time > NOW() then 0
+            else 1
+            end expireFlag
+        FROM
+            oax.red_packet where id = #{id}
+    </select>
+    <select id="getRedPacketDetails" resultType="java.util.Map" parameterType="int">
+        SELECT
+            IFNULL(SUBSTR(u.phone,5),u.email) accountNumber,
+            g.coin_qty  coinQty,
+            g.cny,
+            DATE_FORMAT(g.create_time,'%Y-%m-%d %H:%i')createTime
+        from oax.grab_red_packet_log g
+            LEFT JOIN  oax.user u on u.id = g.user_id
+        where g.red_packet_id = #{redPacketId} ORDER BY g.id desc
+    </select>
+    <select id="grabRedPacketTotalCny" resultType="java.math.BigDecimal" parameterType="int">
+        SELECT SUM(cny) from oax.grab_red_packet_log where user_id = #{userId}
+    </select>
+    <select id="grabRedPacketRecord" resultType="java.util.Map" parameterType="int">
+        SELECT
+            IFNULL(SUBSTR(u.phone,5),u.email) accountNumber,
+            r.coin_name coinName,
+            g.coin_qty coinQty,
+            g.cny,
+            DATE_FORMAT(g.create_time,'%Y-%m-%d %H:%i')createTime
+        from oax.grab_red_packet_log g
+            LEFT JOIN oax.red_packet r on r.id = g.red_packet_id
+            LEFT JOIN oax.user u on u.id = r.user_id
+        where g.user_id = #{userId} ORDER BY g.id desc
+    </select>
+    <select id="getCoinName" resultType="java.lang.String" parameterType="int">
+        select short_name from oax.coin where id = #{coinId}
+    </select>
+    <select id="getCoinByRedPacketId" resultType="java.lang.Integer" parameterType="integer">
+        select coin_id from oax.red_packet where id = #{id}
+    </select>
+    <select id="initRedPacket" resultType="java.util.Map" parameterType="int">
+        SELECT
+            r.id,
+            r.user_id userId,
+                    IFNULL(SUBSTR(u.phone,5),u.email) accountNumber,
+            r.type,
+            r.wish_words wishWords,
+            if(r.total_coin_qty-r.grab_coin_qty,0,1) takeFlag,
+            case WHEN r.expire_time > NOW() then 0
+            else 1
+            end expireFlag
+        from oax.red_packet r
+        LEFT JOIN oax.user u on u.id = r.user_id
+        where r.id = #{id}
+    </select>
+    <select id="selectRedPacketUserCoin" resultType="java.util.Map">
+        select coin_id coinId,banlance from  oax.user_coin where user_id = #{userId}
+        and coin_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+              #{item.coinId}
+        </foreach>
+    </select>
+    <select id="findOverdueRedPacket" resultType="java.util.Map">
+      select
+        id,
+        user_id userId,
+        coin_id coinId,
+        (total_coin_qty-grab_coin_qty) qty
+      from  oax.red_packet where NOW()>expire_time and total_coin_qty>grab_coin_qty and  is_refund = 0
+    </select>
+
+    <update id="addUserCoinFromRedPacket" parameterType="java.util.Map">
+        update oax.user_coin set banlance = banlance + #{qty}
+        where user_id = #{userId} and coin_id = #{coinId}
+    </update>
+    <update id="updateRedPacketIsRefund" parameterType="java.util.Map">
+      update oax.red_packet set is_refund = 1 where id = #{id}
+    </update>
+    <insert id="saveRecharge" parameterType="java.util.Map">
+        INSERT into oax.recharge
+        (user_id,
+        coin_id,
+        type,
+        qty,
+        remark,
+        create_time,
+        update_time)
+        VALUES
+            (
+            #{userId},
+            #{coinId},
+            3,
+            #{qty},
+            '过期红包退回',
+            now(),
+            now()
+            )
+    </insert>
+</mapper>

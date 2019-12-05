@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.ctc.CtcAdvertMapper">
+
+    <resultMap id="CtcAdvertVoMap" type="com.oax.entity.front.vo.CtcAdvertVo">
+        <result column="type" property="type" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <resultMap id="ListCtcAdvertVoMap" type="com.oax.entity.front.vo.ListCtcAdvertVo">
+        <result column="type" property="type" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result column="status" property="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+
+    <resultMap id="CtcAdvertAndUserMerchantMap" type="com.oax.entity.front.vo.ListCtcAdvertVo">
+        <id column="id" property="id"/>
+        <result column="cny_price" property="cnyPrice"/>
+        <result column="coin_id" property="coinId"/>
+        <result column="coin_name" property="coinName"/>
+        <result column="leave_message" property="leaveMessage"/>
+        <result column="max_qty" property="maxQty"/>
+        <result column="min_qty" property="minQty"/>
+        <result column="remain_qty" property="remainQty"/>
+        <result column="status" property="status"/>
+        <result column="total_qty" property="totalQty"/>
+        <result column="type" property="type"/>
+        <result column="create_date" property="createDate"/>
+        <association property="user" javaType="com.oax.entity.admin.User">
+            <id column="id" jdbcType="INTEGER" property="id"/>
+            <result column="username" jdbcType="VARCHAR" property="username"/>
+            <result column="phone" jdbcType="VARCHAR" property="phone"/>
+            <result column="email" jdbcType="VARCHAR" property="email"/>
+            <result column="name" jdbcType="VARCHAR" property="name"/>
+            <result column="password" jdbcType="VARCHAR" property="password"/>
+            <result column="enable" jdbcType="INTEGER" property="enable"/>
+            <result column="google_code" jdbcType="VARCHAR" property="googleCode"/>
+        </association>
+        <association property="merchant" javaType="com.oax.entity.ctc.Merchant">
+            <id column="id"  property="id"/>
+            <result column="buy_fee"  property="buyFee"/>
+            <result column="buy_qty"  property="buyQty"/>
+            <result column="buy_succ_count"  property="buySuccCount"/>
+            <result column="create_date"  property="createDate"/>
+            <result column="payment_way"  property="paymentWay"/>
+            <result column="sale_fee"  property="saleFee"/>
+            <result column="sale_qty"  property="saleQty"/>
+            <result column="sale_succ_count"  property="saleSuccCount"/>
+            <result column="sale_total_count"  property="saleTotalCount"/>
+            <result column="status"  property="status"/>
+            <result column="sale_qty"  property="saleQty"/>
+        </association>
+    </resultMap>
+
+    <select id="hasPutawayByType" resultType="java.lang.Boolean">
+        SELECT IF(COUNT(id)>0,1,0) FROM ctc_advert WHERE user_id = #{userId} AND `type` = #{type} AND `status` = 0
+    </select>
+
+    <select id="getSaleAdvert" resultMap="CtcAdvertVoMap">
+        SELECT * FROM ctc_advert WHERE `type` = 0 AND `status` = 0 ORDER BY id DESC limit 1
+    </select>
+
+    <select id="getBuyAdvert" resultMap="CtcAdvertVoMap">
+        SELECT * FROM ctc_advert WHERE `type` = 1 AND `status` = 0 ORDER BY id DESC limit 1
+    </select>
+
+    <select id="pageForWeb" resultMap="ListCtcAdvertVoMap">
+        SELECT
+        *
+        FROM
+        ctc_advert
+        WHERE 1=1
+        and user_id = #{userId}
+        <if test="type != null">and `type` = #{type}</if>
+        <if test="status != null">AND `status` = #{status}</if>
+        ORDER BY id DESC
+    </select>
+    <select id="getTopSaleTwoAdvertVo" resultType="com.oax.entity.front.vo.CtcAdvertVo">
+        select * from ctc_advert where `status`=0 and `type`=0 and remain_qty >= min_qty order by cny_price limit 2
+    </select>
+    <select id="getTopBuyTwoAdvertVo" resultType="com.oax.entity.front.vo.CtcAdvertVo">
+        select * from ctc_advert where `status`=0 and `type`=1 order by cny_price desc limit 2
+    </select>
+
+    <select id="pageForAdvert" resultMap="CtcAdvertAndUserMerchantMap">
+        SELECT
+        *
+        FROM
+        ctc_advert ca
+        JOIN
+        user u
+        on ca.user_id = u.id
+        JOIN
+        merchant m
+        on ca.merchant_id = m.id
+        WHERE 1=1
+        <if test="type != null">and ca.type = #{type}</if>
+        <if test="status != null">AND ca.status = #{status}</if>
+        ORDER BY create_date DESC
+        limit (#{pageNum}-1)*pageSize,#{pageSize}
+    </select>
+
+    <update id="closeAllByUserId">
+        update ctc_advert set status = 1 where user_id = #{userId}
+    </update>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.activity.DiceConfigMapper">
+
+    <select id="pageForAdmin" resultType="com.oax.entity.front.vo.DiceConfigVo">
+        select
+        dc.*,
+        c.short_name as coinName,
+        c.image as coinImageUrl
+        from dice_config dc
+        join coin c on dc.coin_id = c.id
+    </select>
+
+    <select id="getVoOpenByCoinId" resultType="com.oax.entity.front.vo.DiceConfigVo">
+        select
+        dc.*,
+        c.short_name as coinName,
+        c.image as coinImageUrl
+        from dice_config dc
+        join coin c on dc.coin_id = c.id
+        where dc.coin_id = #{coinId} and dc.`status` = 1
+    </select>
+
+    <select id="getDefaultCoinId" resultType="java.lang.Integer">
+        select coin_id from dice_config where `status`=1 order by sequence limit 1
+    </select>
+
+    <select id="listVoOpen" resultType="com.oax.entity.front.vo.DiceConfigVo">
+        select
+        dc.*,
+        c.short_name as coinName,
+        c.image as coinImageUrl
+        from dice_config dc
+        join coin c on dc.coin_id = c.id
+        where dc.`status` = 1
+        order by dc.sequence
+    </select>
+
+</mapper>

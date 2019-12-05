@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.SumCoinMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.SumCoin">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="sum_date" jdbcType="DATE" property="sumDate"/>
+        <result column="coin_id" jdbcType="INTEGER" property="coinId"/>
+        <result column="recharge_qty" jdbcType="DECIMAL" property="rechargeQty"/>
+        <result column="withdraw_qty" jdbcType="DECIMAL" property="withdrawQty"/>
+        <result column="withdraw_fee" jdbcType="DECIMAL" property="withdrawFee"/>
+        <result column="trade_fee" jdbcType="DECIMAL" property="tradeFee"/>
+        <result column="platform_cost" jdbcType="DECIMAL" property="platformCost"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, sum_date, coin_id, recharge_qty, withdraw_qty, withdraw_fee, trade_fee, platform_cost,
+        create_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.sum_coin
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.sum_coin
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.SumCoin">
+        insert into oax.sum_coin (id, sum_date, coin_id,
+                                  recharge_qty, withdraw_qty, withdraw_fee,
+                                  trade_fee, platform_cost, create_time
+        )
+        values (#{id,jdbcType=INTEGER}, #{sumDate,jdbcType=DATE}, #{coinId,jdbcType=INTEGER},
+                #{rechargeQty,jdbcType=DECIMAL}, #{withdrawQty,jdbcType=DECIMAL}, #{withdrawFee,jdbcType=DECIMAL},
+                #{tradeFee,jdbcType=DECIMAL}, #{platformCost,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.SumCoin">
+        insert into oax.sum_coin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="sumDate != null">
+                sum_date,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="rechargeQty != null">
+                recharge_qty,
+            </if>
+            <if test="withdrawQty != null">
+                withdraw_qty,
+            </if>
+            <if test="withdrawFee != null">
+                withdraw_fee,
+            </if>
+            <if test="tradeFee != null">
+                trade_fee,
+            </if>
+            <if test="platformCost != null">
+                platform_cost,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="sumDate != null">
+                #{sumDate,jdbcType=DATE},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="rechargeQty != null">
+                #{rechargeQty,jdbcType=DECIMAL},
+            </if>
+            <if test="withdrawQty != null">
+                #{withdrawQty,jdbcType=DECIMAL},
+            </if>
+            <if test="withdrawFee != null">
+                #{withdrawFee,jdbcType=DECIMAL},
+            </if>
+            <if test="tradeFee != null">
+                #{tradeFee,jdbcType=DECIMAL},
+            </if>
+            <if test="platformCost != null">
+                #{platformCost,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.SumCoin">
+        update oax.sum_coin
+        <set>
+            <if test="sumDate != null">
+                sum_date = #{sumDate,jdbcType=DATE},
+            </if>
+            <if test="coinId != null">
+                coin_id = #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="rechargeQty != null">
+                recharge_qty = #{rechargeQty,jdbcType=DECIMAL},
+            </if>
+            <if test="withdrawQty != null">
+                withdraw_qty = #{withdrawQty,jdbcType=DECIMAL},
+            </if>
+            <if test="withdrawFee != null">
+                withdraw_fee = #{withdrawFee,jdbcType=DECIMAL},
+            </if>
+            <if test="tradeFee != null">
+                trade_fee = #{tradeFee,jdbcType=DECIMAL},
+            </if>
+            <if test="platformCost != null">
+                platform_cost = #{platformCost,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.SumCoin">
+        update oax.sum_coin
+        set sum_date      = #{sumDate,jdbcType=DATE},
+            coin_id       = #{coinId,jdbcType=INTEGER},
+            recharge_qty  = #{rechargeQty,jdbcType=DECIMAL},
+            withdraw_qty  = #{withdrawQty,jdbcType=DECIMAL},
+            withdraw_fee  = #{withdrawFee,jdbcType=DECIMAL},
+            trade_fee     = #{tradeFee,jdbcType=DECIMAL},
+            platform_cost = #{platformCost,jdbcType=DECIMAL},
+            create_time   = #{createTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getSumCoinByPageGroupByCoinId" resultType="com.oax.entity.admin.vo.SumCoinPageVo">
+
+        select
+        uc.coin_id `coinId`,
+        cn.short_name `coinName`,
+        sum(uc.recharge_qty) `recharge_qty`,
+        sum(uc.withdraw_qty) `withdraw_qty`,
+        sum(uc.withdraw_fee) `withdraw_fee`,
+        sum(uc.trade_fee) `trade_fee`,
+        sum(uc.platform_cost) `platformCost`
+        from oax.coin cn
+        left join oax.sum_coin uc on cn.id = uc.coin_id
+        <where>
+            <if test="coinId!=null">
+                and uc.coin_id = #{coinId}
+            </if>
+            <if test="startTime!=null and endTime!=null">
+                and uc.sum_date between #{startTime} and #{endTime}
+            </if>
+        </where>
+        group by uc.coin_id
+    </select>
+
+</mapper>

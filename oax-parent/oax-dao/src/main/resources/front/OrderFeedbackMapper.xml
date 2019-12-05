@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.OrderFeedbackMapper">
+    <select id="getTotalOrderFeedback" resultType="com.oax.entity.front.TradeSnapshot">
+        SELECT maket_id marketId,
+             SUM(fee_to_x)*0.2 feeToX
+        from oax.trade_snapshot
+        where begin_time >= #{beginTime} and #{endTime} > begin_time
+        GROUP BY maket_id
+    </select>
+    <select id="getCompensationOrdersList" resultType="com.oax.entity.front.Orders">
+        select
+            id,
+            user_id userId,
+            (qty-trade_qty) qty
+        from oax.orders
+        where 15 >= rank
+        and qty > trade_qty
+        and is_feedback = 0
+        and (
+        ( cancel_time is null and status!=-1 )
+        OR
+        (UNIX_TIMESTAMP(cancel_time)- UNIX_TIMESTAMP(create_time))>60*60*12
+        )
+        and market_id = #{marketId}
+        and create_time >= #{beginTime}
+        and #{endTime} > create_time
+    </select>
+    <select id="getTotalWaitTradeQty" resultType="java.math.BigDecimal">
+        select
+            sum(qty-trade_qty)
+        from oax.orders
+        where 15 >= rank
+        and qty > trade_qty
+        and is_feedback = 0
+        and (
+        ( cancel_time is null and status!=-1 )
+        OR
+        (UNIX_TIMESTAMP(cancel_time)- UNIX_TIMESTAMP(create_time))>60*60*12
+        )
+        and market_id = #{marketId}
+        and create_time >= #{beginTime}
+        and #{endTime} > create_time
+    </select>
+    <insert id="insertOrderFeedback" parameterType="com.oax.entity.front.OrderFeedback">
+        INSERT INTO oax.order_feedback
+        (order_id,maket_id,user_id,qty,create_time,order_qty)
+        VALUES(#{orderId},#{marketId},#{userId},#{qty},#{createTime},#{orderQty})
+    </insert>
+    <update id="updateOrdersIsFeedback" parameterType="integer">
+        update oax.orders set is_feedback = 1 where id = #{id}
+    </update>
+    <select id="selectAll" resultType="java.util.Map" parameterType="com.oax.entity.admin.vo.FeedBackVo">
+        SELECT
+            f1.id_name userName,
+            f1.user_id userId,
+            f1.order_qty orderQty,
+            f1.qty feedBackQty,
+            f1.maket_id marketId,
+            CONCAT(c1.short_name,'/',c2.short_name) marketName,
+            f1.create_time createTime
+        from
+        (select u.id_name,of.user_id,of.order_qty,of.qty,of.maket_id,of.create_time from oax.order_feedback of
+        LEFT JOIN oax.user u on of.user_id = u.id
+        <where>
+            <if test="marketId!=null">
+                of.maket_id = #{marketId}
+            </if>
+            <if test="beginTime!=null" >
+                and of.create_time >= #{beginTime}
+            </if>
+            <if test="endTime!=null" >
+                and #{endTime} >= of.create_time
+            </if>
+            <if test="userId!=null" >
+                and of.user_id = #{userId}
+            </if>
+        </where>
+        ) f1
+        LEFT JOIN oax.market m on f1.maket_id = m.id
+        LEFT JOIN oax.coin c1 on c1.id = m.coin_id
+        LEFT JOIN oax.market_category mc on mc.id = m.market_category_id
+        LEFT JOIN oax.coin c2 on mc.coin_id = c2.id
+        order by f1.create_time desc
+    </select>
+</mapper>

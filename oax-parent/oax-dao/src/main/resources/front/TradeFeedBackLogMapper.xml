@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.TradeFeedBackLogMapper">
+    <select id="getTradeSnapshotByYesterday" resultType="com.oax.entity.front.TradeSnapshot">
+        SELECT
+            id,
+            maket_id marketId,
+            begin_time beginTime,
+            end_time endTime,
+            trade_qty tradeQty,
+            fee_to_eth feeToETH,
+            fee_to_x feeToX,
+            avg_feedback_x avgFeeBackX,
+            status
+        FROM
+            oax.trade_snapshot
+        WHERE status in(0,1) AND begin_time >= #{minDate} AND #{maxDate}>= begin_time
+    </select>
+    <select id="getWaitFeedBackTradeList" resultType="com.oax.entity.front.Trade" parameterType="com.oax.entity.front.TradeSnapshot">
+        SELECT
+            id,
+            user_id userId,
+            qty
+        FROM oax.trade
+        WHERE create_time >= #{beginTime} AND #{endTime} >= create_time
+        AND market_id = #{marketId}
+        AND is_feedback = 0
+    </select>
+    <update id="updateStatus">
+        UPDATE oax.trade_snapshot SET status = #{status} WHERE id = #{id}
+    </update>
+    <insert id="insert" parameterType="com.oax.entity.front.TradeFeedBack">
+        INSERT INTO oax.trade_feedback
+        (
+        snapshot_id,
+        trade_id,
+        user_id,
+        trade_qty,
+        qty,
+        create_time
+        )
+        VALUES
+        (
+        #{snapshotId},
+        #{tradeId},
+        #{userId},
+        #{tradeQty},
+        #{qty},
+        #{createTime}
+        )
+    </insert>
+    <update id="updateTrade" parameterType="integer">
+        UPDATE oax.trade SET is_feedback = 1
+        WHERE id = #{id}
+    </update>
+    <select id="selectUserCoin" resultType="java.lang.Integer" parameterType="com.oax.entity.front.UserCoin">
+        select count(1) from oax.user_coin where user_id = #{userId} and coin_id = #{coinId}
+    </select>
+    <update id="updateUserCoinByUserIdAndCoinId" parameterType="com.oax.entity.front.UserCoin">
+      update oax.user_coin set banlance = banlance + #{banlance}
+      where user_id = #{userId} and coin_id = #{coinId}
+    </update>
+    <insert id="insertUserCoin" parameterType="com.oax.entity.front.UserCoin">
+        insert into oax.user_coin
+        (
+          user_id,
+          coin_id,
+          banlance,
+          freezing_banlance,
+          create_time,
+          update_time
+        )
+        values (
+          #{userId},
+          #{coinId},
+          #{banlance},
+          #{freezingBanlance},
+          #{createTime},
+          #{updateTime}
+        )
+    </insert>
+
+    <select id="getMyFeedBack" resultType="java.math.BigDecimal">
+        select TRUNCATE((
+        (SELECT ifnull(sum(qty),0) FROM trade_feedback where user_id=#{userId,jdbcType=INTEGER} AND create_time>=#{beginTime,jdbcType=VARCHAR} and create_time &lt;#{endTime,jdbcType=VARCHAR})
+        +
+        (select ifnull(SUM(qty),0) from oax.order_feedback where user_id =#{userId,jdbcType=INTEGER} and create_time >=#{beginTime,jdbcType=VARCHAR} and create_time &lt;#{endTime,jdbcType=VARCHAR})
+        ),8)
+    </select>
+    <select id="selectAll" resultType="java.util.Map" parameterType="com.oax.entity.admin.vo.FeedBackVo">
+        select
+            f1.id_name userName,
+            f1.user_id userId,
+            f1.trade_qty tradeQty ,
+            f1.qty feedBackQty,
+            f1.begin_time beginTime,
+            f1.end_time endTime,
+            f1.maket_id marketId,
+            CONCAT(c1.short_name,'/',c2.short_name) marketName
+        from
+        (SELECT u.id_name,tf.user_id,tf.trade_qty,tf.qty,tp.begin_time,tp.end_time,tp.maket_id FROM oax.trade_feedback tf
+          LEFT JOIN oax.user u
+          on u.id = tf.user_id
+          LEFT JOIN oax.trade_snapshot tp on tf.snapshot_id = tp.id
+          <where>
+              <if test="marketId!=null" >
+                  tp.maket_id = #{marketId}
+              </if>
+              <if test="beginTime!=null" >
+                  and tp.begin_time >= #{beginTime}
+              </if>
+              <if test="endTime!=null" >
+                  and #{endTime} >=tp.begin_time
+              </if>
+              <if test="userId!=null and userId!=''" >
+                  and tf.user_id = #{userId}
+              </if>
+          </where>
+        ) f1
+        LEFT JOIN oax.market m on f1.maket_id = m.id
+        LEFT JOIN oax.coin c1 on c1.id = m.coin_id
+        LEFT JOIN oax.market_category mc on mc.id = m.market_category_id
+        LEFT JOIN oax.coin c2 on mc.coin_id = c2.id
+        order by f1.begin_time desc
+    </select>
+    <select id="collectFeedBack" resultType="java.util.Map" parameterType="com.oax.entity.admin.vo.FeedBackVo">
+        SELECT ROUND(IFNULL(SUM(fee_to_x),0),8)feeToX,ROUND(IFNULL(SUM(fee_to_eth),0),8)feeToETH from oax.trade_snapshot
+        <where>
+            <if test="beginTime!=null" >
+                and begin_time >= #{beginTime}
+            </if>
+            <if test="endTime!=null" >
+                and #{endTime} >= begin_time
+            </if>
+        </where>
+    </select>
+</mapper>

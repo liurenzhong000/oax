@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.admin.UserInfoMapper">
+
+    <!-- 	分页模糊查询注册的用户列表数据 -->
+    <select id="findList" parameterType="com.oax.entity.admin.param.MemberParam"
+            resultType="com.oax.entity.admin.vo.UserInfoVo">
+        SELECT
+        a.id id,
+        a.id_name name,
+        a.phone phone,
+        a.email email,
+        a.verification_type verificationType,
+        a.id_no cardNo,
+        a.register_time registerTime,
+        a.level level,
+        a.check_time checkTime,
+        a.lock_status lockStatus,
+        a.source source
+        FROM oax.user a
+        <where>
+            <if test="id != null and id != ''">
+                a.id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and a.id_name like concat('%',#{name},'%')
+            </if>
+            <if test="emailOrPhone != null and emailOrPhone!=''">
+                and (a.phone like concat('%',#{emailOrPhone},'%') or
+                a.email like concat('%',#{emailOrPhone},'%'))
+            </if>
+            <if test="cardNo != null and cardNo!=''">
+                and a.id_no like concat('%',#{cardNo},'%')
+            </if>
+            <if test="source != null and source!=''">
+                and a.source = #{source}
+            </if>
+            <if test="regBeginDate != null">
+                and a.register_time &gt;= #{regBeginDate}
+            </if>
+            <if test="regEndDate != null">
+                and a.register_time &lt;= #{regEndDate}
+            </if>
+            <if test="checkBeginDate != null">
+                and a.check_time &gt;= #{checkBeginDate}
+            </if>
+            <if test="checkEndDate != null">
+                and a.check_time &lt;= #{checkEndDate}
+            </if>
+            <if test="lockStatus != null and lockStatus!=''">
+                and a.lock_status = #{lockStatus}
+            </if>
+            <if test="level != null">
+                and a.level = #{level}
+            </if>
+        </where>
+        order by a.register_time desc
+    </select>
+
+    <update id="updateLockStatusZero" parameterType="com.oax.entity.admin.param.UserLockStatusParam">
+        update oax.user a
+        set a.lock_status = #{lockStatus}
+        where a.id = #{userId} and a.lock_status = 0
+    </update>
+
+    <update id="updateLockStatusOne" parameterType="com.oax.entity.admin.param.UserLockStatusParam">
+        update oax.user a
+        set a.lock_status = #{lockStatus}
+        where a.id = #{userId} and a.lock_status = 1
+    </update>
+
+    <select id="getByUserIdQueryUserDetails" parameterType="com.oax.entity.admin.param.UserDetailsParam"
+            resultType="com.oax.entity.admin.vo.UserDetailsVo">
+        SELECT
+        c.id,
+        c.short_name shortName,
+        (a.banlance + a.freezing_banlance) allBanlance,
+        a.banlance banlance,
+        a.freezing_banlance freezingBanlance,
+        (select ifnull(sum(r2.qty),0)
+        from oax.recharge r2
+        where
+        r2.coin_id = a.coin_id
+        and
+        r2.user_id = a.user_id
+        ) sumRechargeQty,
+        (select ifnull(sum(w.qty),0)
+        from oax.withdraw w
+        where
+        w.coin_id = a.coin_id
+        and
+        w.user_id = a.user_id
+        and
+        w.status >=2
+        ) sumWithdrawQty,
+        (select ifnull(sum(w.fee),0)
+        from oax.withdraw w
+        where
+        w.coin_id = a.coin_id
+        and
+        w.user_id = a.user_id
+        ) sumWithdrawFee,
+        (select ifnull(sum(t.fee),0)
+        from oax.trade t
+        where t.left_coin_id = a.coin_id
+        and t.user_id = a.user_id
+        ) sumTradeFee
+        FROM
+        oax.user_coin a
+        LEFT JOIN oax.coin c ON a.coin_id = c.id
+        <where>
+            <if test="coinId != null">
+                and c.id = #{coinId}
+            </if>
+            <if test="userId != null">
+                and a.user_id = #{userId}
+            </if>
+        </where>
+        GROUP BY c.id
+    </select>
+
+    <select id="get" parameterType="int" resultType="com.oax.entity.admin.vo.UserDetailsUpVo">
+        select
+            u.id,
+            u.id_name           name,
+            u.phone             phone,
+            u.email             email,
+            u.lock_status       lockStatus,
+            u.register_time     registerTime,
+            u.level             level,
+            u.verification_type verificationType,
+            u.id_no             idNo,
+            sc.value            quota,
+            u.register_type     `register_type`
+        from oax.user u
+            left join oax.sys_config sc on sc.id = u.level
+        where u.id = #{userId}
+    </select>
+
+    <select id="getByUserIdQueryUserInvite" parameterType="com.oax.entity.admin.param.UserInviteParam"
+            resultType="com.oax.entity.admin.vo.UserInviteVo">
+        select
+        u.id userId,
+        u.id_name name,
+        u.phone,
+        u.email,
+        u.verification_type verificationType,
+        u.id_no idNo,
+        u.register_time registerTime,
+        u.level,
+        u.lock_status lockStatus,
+        u.check_time checkTime
+        FROM oax.user u
+        where u.from_user_id = #{userId}
+        <if test="beginTime != null">
+            and u.register_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and u.register_time &lt;= #{endTime}
+        </if>
+        <if test="level != null and level != ''">
+            and u.level = #{level}
+        </if>
+    </select>
+
+    <select id="queryUserList" parameterType="com.oax.entity.admin.param.UserInfoAuditParam"
+            resultType="com.oax.entity.admin.vo.UserInfoAuditVo">
+        SELECT
+        a.id userId,
+        a.id_name name,
+        a.phone,
+        a.email,
+        a.verification_type verificationType,
+        a.id_no cardNo,
+        a.update_time `checkTime`
+        FROM oax.user a
+        where a.level = #{level} and a.check_status = #{checkStatus} and a.lock_status = #{lockStatus}
+        <if test="id!=null and id!=''">
+            and a.id = #{id}
+        </if>
+        <if test="name!=null and name!=''">
+            and a.id_name like concat('%',#{name},'%')
+        </if>
+        <if test="emailOrPhone!=null and emailOrPhone!=''">
+            and (a.phone like concat('%',#{emailOrPhone},'%') or
+            a.email like concat('%',#{emailOrPhone},'%'))
+        </if>
+        <if test="cardNo!=null and cardNo!=''">
+            and a.id_no like concat('%',#{cardNo},'%')
+        </if>
+        <if test="regBeginDate!=null">
+            and a.register_time &gt;= #{regBeginDate}
+        </if>
+        <if test="regEndDate!=null">
+            and a.register_time &lt;= #{regEndDate}
+        </if>
+
+        order by a.register_time desc
+    </select>
+
+    <select id="getUserAuditPage" parameterType="com.oax.entity.admin.UserAudit"
+            resultType="com.oax.entity.admin.vo.UserAuditLogVo">
+        select
+            admin.id      adminId,
+            admin.name    adminName,
+            l.create_time disposeTime,
+            l.status      status,
+            l.remark      describes
+        from oax_admin.lv2_check_log l
+            left join oax.user u on u.id = l.user_id
+            left join oax_admin.user admin on admin.id = l.admin_id
+        where l.user_id = #{userId}
+    </select>
+
+    <update id="updateLevel" parameterType="com.oax.entity.admin.param.UserInfoAuditParam" flushCache="false">
+        update oax.user a
+        set a.level = #{level}, a.check_time = #{checkTime}
+        <if test="checkStatus!=null">
+            ,a.check_status = #{checkStatus}
+        </if>
+        where a.id = #{id}
+    </update>
+
+    <select id="queryUserLevel" parameterType="int" resultType="java.lang.Integer">
+        select u.level
+        from oax.user u
+        where u.id = #{userId}
+    </select>
+
+    <select id="getByUserIdQueryLockStatus" parameterType="int" resultType="java.lang.Integer">
+        select u.lock_status
+        from oax.user u
+        where u.id = #{id}
+    </select>
+    <select id="getAuditUserByUserId" resultType="com.oax.entity.admin.UserAudit">
+        select
+            u.id                userId,
+            u.id_name           name,
+            u.verification_type verificationType,
+            u.id_no             cardNo,
+            u.id_image_a        idImageA,
+            u.id_image_b        idImageB
+        from oax.user u
+        where u.id = #{userId}
+    </select>
+    <select id="selectById" resultType="com.oax.entity.front.Member">
+        select *
+        from oax.user
+        where id = #{userId}
+    </select>
+    <select id="getByUserIdQueryUserInviteInUserIds" resultType="com.oax.entity.admin.vo.UserInviteVo">
+        select
+        u.id userId,
+        u.id_name name,
+        u.phone,
+        u.email,
+        u.verification_type verificationType,
+        u.id_no idNo,
+        u.register_time registerTime,
+        u.level,
+        u.lock_status lockStatus,
+        u.check_time checkTime
+        FROM oax.user u
+        where u.id in
+        <foreach collection="userIds" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="userInviteParam.beginTime != null">
+            and u.register_time &gt;= #{userInviteParam.beginTime}
+        </if>
+        <if test="userInviteParam.endTime != null">
+            and u.register_time &lt;= #{userInviteParam.endTime}
+        </if>
+        <if test="userInviteParam.level != null and userInviteParam.level != ''">
+            and u.level = #{userInviteParam.level}
+        </if>
+        order by field(u.id,
+        <foreach collection="userIds" item="item" index="index"  separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

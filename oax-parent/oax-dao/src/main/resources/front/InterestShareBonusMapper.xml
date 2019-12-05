@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.InterestShareBonusMapper">
+    <select id="getInterestFee" resultType="com.oax.entity.front.InterestShareBonus">
+        SELECT t1.fee qty,t1.fee_coin_id coinId
+        from (SELECT  coin_id from  oax.lock_position where status=0 and  #{endTime} > (create_time + INTERVAL 1 DAY) GROUP BY coin_id) mc
+        JOIN (SELECT t.fee_coin_id,SUM(fee)fee from oax.trade t FORCE INDEX(idx_trade_create_time)
+                where t.create_time >=#{beginTime} and #{endTime} >t.create_time group BY t.fee_coin_id) t1
+        on t1.fee_coin_id = mc.coin_id
+    </select>
+    <insert id="insert" parameterType="com.oax.entity.front.InterestShareBonus">
+        INSERT INTO oax.interest_sharebonus
+        (
+        lock_position_id,
+        user_id,
+        coin_id,
+        qty,
+        create_time
+        )
+        VALUES
+        (
+        #{lockPositionId},
+        #{userId},
+        #{coinId},
+        #{qty},
+        #{createTime}
+        )
+    </insert>
+    <select id="myIncome" resultType="java.util.Map" parameterType="integer">
+        SELECT f1.id,
+               f1.coin_id coinId,
+               c.short_name coinName,
+               IFNULL(f2.banlance,0)banlance,
+               IFNULL(f3.lock_qty,0)lockQty,
+               IFNULL(f4.qty,0) interestQty
+        FROM
+            (SELECT coin_id,id from oax.coin_lock_config where is_show =1) f1
+        LEFT JOIN
+            (SELECT coin_id,banlance  from oax.user_coin where user_id = #{userId}) f2
+        on f1.coin_id = f2.coin_id
+        LEFT JOIN
+            (SELECT SUM(lock_qty) lock_qty,coin_id from  oax.lock_position  where user_id = #{userId} and status =0 GROUP BY coin_id) f3
+        on f1.coin_id = f3.coin_id
+        LEFT JOIN
+            (select coin_id,SUM(qty)qty from oax.interest_sharebonus where user_id = #{userId} GROUP BY coin_id ) f4
+        on f1.coin_id = f4.coin_id
+        LEFT JOIN oax.coin c  on c.id = f1.coin_id
+    </select>
+</mapper>

@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.MovesayMoneyActiveListMapper">
+  <resultMap id="BaseResultMap" type="com.oax.entity.front.MovesayMoneyActiveList">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="active_id" jdbcType="INTEGER" property="activeId" />
+    <result column="market_id" jdbcType="INTEGER" property="marketId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="date" jdbcType="INTEGER" property="date" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="profits" jdbcType="INTEGER" property="profits" />
+    <result column="profits_money" jdbcType="DECIMAL" property="profitsMoney" />
+    <result column="join_money" jdbcType="DECIMAL" property="joinMoney" />
+    <result column="cumulative_join" jdbcType="DECIMAL" property="cumulativeJoin" />
+    <result column="deposit_money" jdbcType="DECIMAL" property="depositMoney" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, active_id, market_id, user_id, date, type, profits, profits_money, join_money, 
+    cumulative_join, deposit_money, status, create_time, update_time, start_time, end_time
+  </sql>
+  <select id="selectByExample" parameterType="com.oax.entity.front.MovesayMoneyActiveListExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from movesay_money_active_list
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+<select id="selectRushPage" parameterType="com.oax.entity.admin.param.rushPageParam" resultType="com.oax.entity.admin.vo.MovesayMoneyActiveListVO">
+      SELECT
+         a.id  id,
+         a.active_id    activeId,
+         a.market_id     marketId,
+         a.user_id      userId,
+         COALESCE(b.phone,b.email)  userName,
+         a.join_money        joinMoney,
+         a.cumulative_join   cumulativeJoin,
+         a.profits        profits,
+         a.profits_money  profitsMoney,
+         a.deposit_money  depositMoney,
+         a.start_time     startTime,
+         a.end_time       endTime,
+         a.status         status
+        from oax.movesay_money_active_list a
+        LEFT JOIN oax.user b on a.user_id= b.id
+       <where>
+       <if test="activeId !=null">
+        a.active_id = #{activeId}
+       </if>
+      <if test="marketId !=null">
+        and a.market_id = #{marketId}
+      </if>
+      <if test="userId !=null">
+        and a.user_id = #{userId}
+      </if>
+      <if test="status !=null">
+        and a.status= #{status}
+      </if>
+      <if test="startTime!=null">
+         and a.start_time>=#{startTime}
+      </if>
+      <if test="endTime!=null">
+         and #{endTime}>=a.end_time
+      </if>
+    </where>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from movesay_money_active_list
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from movesay_money_active_list
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.oax.entity.front.MovesayMoneyActiveListExample">
+    delete from movesay_money_active_list
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.oax.entity.front.MovesayMoneyActiveList">
+    insert into movesay_money_active_list (id, active_id, market_id, 
+      user_id, date, type, 
+      profits, profits_money, join_money, 
+      cumulative_join, deposit_money, status, 
+      create_time, update_time, start_time, 
+      end_time)
+    values (#{id,jdbcType=VARCHAR}, #{activeId,jdbcType=INTEGER}, #{marketId,jdbcType=INTEGER}, 
+      #{userId,jdbcType=INTEGER}, #{date,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
+      #{profits,jdbcType=INTEGER}, #{profitsMoney,jdbcType=DECIMAL}, #{joinMoney,jdbcType=DECIMAL}, 
+      #{cumulativeJoin,jdbcType=DECIMAL}, #{depositMoney,jdbcType=DECIMAL}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.oax.entity.front.MovesayMoneyActiveList">
+    insert into movesay_money_active_list
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="activeId != null">
+        active_id,
+      </if>
+      <if test="marketId != null">
+        market_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="date != null">
+        date,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="profits != null">
+        profits,
+      </if>
+      <if test="profitsMoney != null">
+        profits_money,
+      </if>
+      <if test="joinMoney != null">
+        join_money,
+      </if>
+      <if test="cumulativeJoin != null">
+        cumulative_join,
+      </if>
+      <if test="depositMoney != null">
+        deposit_money,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="activeId != null">
+        #{activeId,jdbcType=INTEGER},
+      </if>
+      <if test="marketId != null">
+        #{marketId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="profits != null">
+        #{profits,jdbcType=INTEGER},
+      </if>
+      <if test="profitsMoney != null">
+        #{profitsMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="joinMoney != null">
+        #{joinMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="cumulativeJoin != null">
+        #{cumulativeJoin,jdbcType=DECIMAL},
+      </if>
+      <if test="depositMoney != null">
+        #{depositMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.oax.entity.front.MovesayMoneyActiveListExample" resultType="java.lang.Long">
+    select count(*) from movesay_money_active_list
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <select id="selectMaxOrderNo" parameterType="java.lang.Integer" resultType="java.lang.String">
+    select max(id)
+    from movesay_money_active_list
+    where active_id = #{active_id,jdbcType=INTEGER}
+  </select>
+  <update id="updateStatus">
+     update movesay_money_active_list
+     set status = #{status,jdbcType=INTEGER}
+     where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByExampleSelective" parameterType="map">
+    update movesay_money_active_list
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.activeId != null">
+        active_id = #{record.activeId,jdbcType=INTEGER},
+      </if>
+      <if test="record.marketId != null">
+        market_id = #{record.marketId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=INTEGER},
+      </if>
+      <if test="record.date != null">
+        date = #{record.date,jdbcType=INTEGER},
+      </if>
+      <if test="record.type != null">
+        type = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.profits != null">
+        profits = #{record.profits,jdbcType=INTEGER},
+      </if>
+      <if test="record.profitsMoney != null">
+        profits_money = #{record.profitsMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="record.joinMoney != null">
+        join_money = #{record.joinMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="record.cumulativeJoin != null">
+        cumulative_join = #{record.cumulativeJoin,jdbcType=DECIMAL},
+      </if>
+      <if test="record.depositMoney != null">
+        deposit_money = #{record.depositMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=INTEGER},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.startTime != null">
+        start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.endTime != null">
+        end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update movesay_money_active_list
+    set id = #{record.id,jdbcType=VARCHAR},
+      active_id = #{record.activeId,jdbcType=INTEGER},
+      market_id = #{record.marketId,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=INTEGER},
+      date = #{record.date,jdbcType=INTEGER},
+      type = #{record.type,jdbcType=INTEGER},
+      profits = #{record.profits,jdbcType=INTEGER},
+      profits_money = #{record.profitsMoney,jdbcType=DECIMAL},
+      join_money = #{record.joinMoney,jdbcType=DECIMAL},
+      cumulative_join = #{record.cumulativeJoin,jdbcType=DECIMAL},
+      deposit_money = #{record.depositMoney,jdbcType=DECIMAL},
+      status = #{record.status,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      end_time = #{record.endTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.MovesayMoneyActiveList">
+    update movesay_money_active_list
+    <set>
+      <if test="activeId != null">
+        active_id = #{activeId,jdbcType=INTEGER},
+      </if>
+      <if test="marketId != null">
+        market_id = #{marketId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="date != null">
+        date = #{date,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="profits != null">
+        profits = #{profits,jdbcType=INTEGER},
+      </if>
+      <if test="profitsMoney != null">
+        profits_money = #{profitsMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="joinMoney != null">
+        join_money = #{joinMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="cumulativeJoin != null">
+        cumulative_join = #{cumulativeJoin,jdbcType=DECIMAL},
+      </if>
+      <if test="depositMoney != null">
+        deposit_money = #{depositMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.MovesayMoneyActiveList">
+    update movesay_money_active_list
+    set active_id = #{activeId,jdbcType=INTEGER},
+      market_id = #{marketId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      date = #{date,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      profits = #{profits,jdbcType=INTEGER},
+      profits_money = #{profitsMoney,jdbcType=DECIMAL},
+      join_money = #{joinMoney,jdbcType=DECIMAL},
+      cumulative_join = #{cumulativeJoin,jdbcType=DECIMAL},
+      deposit_money = #{depositMoney,jdbcType=DECIMAL},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

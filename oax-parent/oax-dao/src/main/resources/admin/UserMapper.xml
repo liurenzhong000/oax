@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.admin.UserMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.admin.User">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="enable" jdbcType="INTEGER" property="enable"/>
+        <result column="google_code" jdbcType="VARCHAR" property="googleCode"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, username, password, enable,name,phone,email,google_code
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax_admin.user
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax_admin.user
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.admin.User">
+        insert into oax_admin.user (id, username, password,
+        enable,name,phone,email,google_code)
+        values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+        #{enable,jdbcType=INTEGER},#{name,jdbcType=VARCHAR},#{phone,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},#{googleCode,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.admin.User">
+        insert into oax_admin.user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="username != null">
+                username,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="enable != null">
+                enable,
+            </if>
+            <if test="googleCode != null">
+                google_code,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="enable != null">
+                #{enable,jdbcType=INTEGER},
+            </if>
+            <if test="googleCode != null">
+                #{googleCode,jdbcType=INTEGER}
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.admin.User">
+        update oax_admin.user
+        <set>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="enable != null">
+                enable = #{enable,jdbcType=INTEGER},
+            </if>
+            <if test="googleCode != null">
+                google_code = #{googleCode,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.admin.User">
+        update oax_admin.user
+        set username = #{username,jdbcType=VARCHAR},
+        password = #{password,jdbcType=VARCHAR},
+        name = #{name,jdbcType=VARCHAR},
+        phone = #{phone,jdbcType=VARCHAR},
+        email = #{email,jdbcType=VARCHAR},
+        enable = #{enable,jdbcType=INTEGER},
+        google_code=#{googleCode,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectByUsername" resultType="com.oax.entity.admin.User">
+        select
+        id,
+        username,
+        name,
+        phone,
+        email,
+        password,
+        enable,
+        google_code
+        from oax_admin.user
+        where username = #{username}
+    </select>
+    <select id="selectAll" resultType="com.oax.entity.admin.User">
+        select
+        id,
+        username,
+        name,
+        phone,
+        email,
+        password,
+        enable,
+        google_code
+        from oax_admin.user
+    </select>
+    <select id="selectAllByUserPageParam" resultType="com.oax.entity.admin.User">
+        select
+        id,
+        username,
+        name,
+        phone,
+        email,
+        password,
+        enable,
+        google_code
+        from oax_admin.user u
+        <where>
+            <if test="userId!=null">
+                and u.id = #{userId}
+            </if>
+            <if test="username != null">
+                and u.username like concat('%',#{username},'%')
+            </if>
+            <if test="userStatus!=null">
+                and u.enable = #{userStatus}
+            </if>
+
+        </where>
+    </select>
+</mapper>

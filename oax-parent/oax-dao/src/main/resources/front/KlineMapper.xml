@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.KlineMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.Kline">
+        <result column="id" jdbcType="INTEGER" property="id"/>
+        <result column="market_id" jdbcType="INTEGER" property="marketId"/>
+        <result column="open" jdbcType="DOUBLE" property="open"/>
+        <result column="high" jdbcType="DOUBLE" property="high"/>
+        <result column="low" jdbcType="DOUBLE" property="low"/>
+        <result column="close" jdbcType="DOUBLE" property="close"/>
+        <result column="qty" jdbcType="DOUBLE" property="qty"/>
+        <result column="laste_trade_id" jdbcType="INTEGER" property="lasteTradeId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.oax.entity.front.Kline">
+        insert into kline (id, market_id, open, min_type,
+        high, low, close, qty,
+        laste_trade_id, create_time)
+        values (#{id,jdbcType=INTEGER}, #{marketId,jdbcType=INTEGER},
+        #{open,jdbcType=DOUBLE},#{minType,jdbcType=INTEGER},
+        #{high,jdbcType=DOUBLE}, #{low,jdbcType=DOUBLE}, #{close,jdbcType=DOUBLE}, #{qty,jdbcType=DOUBLE},
+        #{lasteTradeId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.Kline">
+        insert into kline
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="marketId != null">
+                market_id,
+            </if>
+            <if test="open != null">
+                open,
+            </if>
+            <if test="minType!=null">
+                min_type,
+            </if>
+            <if test="high != null">
+                high,
+            </if>
+            <if test="low != null">
+                low,
+            </if>
+            <if test="close != null">
+                close,
+            </if>
+            <if test="qty != null">
+                qty,
+            </if>
+            <if test="lasteTradeId != null">
+                laste_trade_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="marketId != null">
+                #{marketId,jdbcType=INTEGER},
+            </if>
+            <if test="open != null">
+                #{open,jdbcType=DOUBLE},
+            </if>
+            <if test="minType!=null">
+                #{minType,jdbcType=INTEGER},
+            </if>
+            <if test="high != null">
+                #{high,jdbcType=DOUBLE},
+            </if>
+            <if test="low != null">
+                #{low,jdbcType=DOUBLE},
+            </if>
+            <if test="close != null">
+                #{close,jdbcType=DOUBLE},
+            </if>
+            <if test="qty != null">
+                #{qty,jdbcType=DOUBLE},
+            </if>
+            <if test="lasteTradeId != null">
+                #{lasteTradeId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <select id="findListByMarketId" parameterType="java.util.HashMap" resultType="com.oax.entity.front.Kline">
+        select
+        id, market_id marketId,
+        oax.kline.open,
+        oax.kline.close ,
+        high,low,
+        qty,laste_trade_id lasteTradeId,
+        min_type minType,
+        create_time createTime,
+        qty
+        from oax.kline
+        where market_id = #{marketId} and min_type = #{minType}
+    </select>
+    <select id="findListByMarketIdGtOneDay" parameterType="int" resultType="com.oax.entity.front.Kline">
+        select
+        id, market_id marketId,
+        oax.kline.open,
+        oax.kline.close ,
+        high,low,
+        qty,laste_trade_id lasteTradeId,
+        min_type minType,
+        qty,
+        create_time createTime
+        from oax.kline
+        where market_id = #{marketId}
+        and oax.kline.min_type > 1440
+    </select>
+    
+    <select id="pullKline" resultType="com.oax.entity.front.Kline">
+		SELECT
+			t.marketId,
+			t.qty,
+			o.price 'open',
+			c.price 'close',
+			t.low,
+			t.high,
+			t.lasteTradeId,
+			#{minType,jdbcType=INTEGER} AS minType
+		FROM
+		(SELECT market_id marketId, MIN(price) low,MAX(price) high ,SUM(qty) qty,MAX(id) lasteTradeId 
+		 FROM oax.trade FORCE INDEX(idx_trade_create_time) WHERE create_time >= #{beginDate} AND #{endDate}  > create_time GROUP BY market_id ) t
+		LEFT JOIN (
+			SELECT t1.market_id,t1.price FROM oax.trade t1
+			JOIN
+				(SELECT MIN(id) id FROM oax.trade FORCE INDEX(idx_trade_create_time) WHERE create_time >= #{beginDate} AND #{endDate} > create_time GROUP BY market_id) f1
+			ON f1.id = t1.id
+		) o ON o.market_id = t.marketId
+		LEFT JOIN (
+			SELECT t2.market_id,t2.price FROM oax.trade t2
+			JOIN
+				(SELECT MAX(id) id FROM oax.trade FORCE INDEX(idx_trade_create_time) WHERE create_time >= #{beginDate} AND #{endDate} > create_time GROUP BY market_id) f2
+			ON f2.id = t2.id
+		) c ON c.market_id = t.marketId
+    </select>
+	<insert id="batchSave" parameterType="java.util.List">
+   		INSERT INTO oax.kline 
+		( 
+			 min_type,
+			 market_id,
+			 open,
+			 high,
+			 low,
+			 close,
+			 qty,
+			 laste_trade_id,
+			 create_time)			 
+			VALUES
+			<foreach collection="list" item="item" separator="," index="index">		
+			(
+			#{item.minType},
+			#{item.marketId},
+			#{item.open},
+     		#{item.high},
+    		#{item.low},
+     		#{item.close},
+    		#{item.qty},
+    		#{item.lasteTradeId},		
+    		now()
+			)
+			</foreach>
+	</insert>
+	<insert id="batchSaveGt1440" parameterType="java.util.List">
+   		INSERT INTO oax.kline 
+		( 
+			 min_type,
+			 market_id,
+			 open,
+			 high,
+			 low,
+			 close,
+			 qty,
+			 laste_trade_id,
+			 create_time)			 
+			VALUES
+			<foreach collection="list" item="item" separator="," index="index">		
+			(
+			#{item.minType},
+			#{item.marketId},
+			#{item.open},
+     		#{item.high},
+    		#{item.low},
+     		#{item.close},
+    		#{item.qty},
+    		#{item.lasteTradeId},		
+    		#{item.createTime}
+			)
+			</foreach>
+	</insert>
+	<insert id="removeKline">
+		INSERT INTO oax_history.kline
+		select * from oax.kline where id not in
+		<foreach collection="ids" index="index" item="id" open="(" separator="," close=")">  
+            #{id}  
+        </foreach>
+		and market_id = #{marketId} and min_type = #{minType}
+		
+	</insert>
+	<select id="selectListGT1500" resultType="com.oax.entity.front.KlineInfo">
+		select market_id marketId,min_type minType,count(1) amount from oax.kline group by market_id,min_type
+	</select>
+	<select id="getKlineIds" resultType="int">
+		select id from oax.kline where market_id = #{marketId} and min_type = #{minType} order by id desc LIMIT 1500
+	</select>
+	<delete id="deleteKline">
+		DELETE FROM oax.kline  where id not in
+		<foreach collection="ids" index="index" item="id" open="(" separator="," close=")">  
+            #{id}  
+        </foreach>
+        and market_id = #{marketId} and min_type = #{minType}
+	</delete>
+	<select id="getKlineList" resultType="com.oax.entity.front.Kline">
+		select
+        id, market_id marketId,
+        oax.kline.open,
+        oax.kline.close ,
+        high,low,
+        qty,laste_trade_id lasteTradeId,
+        min_type minType,
+        create_time createTime,
+        qty
+        from oax.kline
+        where market_id = #{marketId} and min_type = #{minType} 
+	</select>
+
+    <select id="getKlineListLimit" resultType="com.oax.entity.front.Kline">
+        SELECT
+        id, market_id marketId,
+        oax.kline.open,
+        oax.kline.close ,
+        high,low,
+        qty,
+        laste_trade_id lasteTradeId,
+        min_type minType,
+        create_time createTime
+        FROM oax.kline
+        where market_id = #{marketId} and min_type = #{minType}
+        ORDER BY id DESC, market_id
+        LIMIT 1440
+	</select>
+
+    <select id="getKlineListLast" resultType="com.oax.entity.front.Kline">
+		select
+        id, market_id marketId,
+        oax.kline.open,
+        oax.kline.close ,
+        high,low,
+        qty,laste_trade_id lasteTradeId,
+        min_type minType,
+        create_time createTime,
+        qty
+        from oax.kline
+        where market_id = #{marketId} and min_type = #{minType}  order  by id desc limit #{number}
+	</select>
+
+    <select id="findYesterdayKline" resultType="com.oax.entity.front.Kline">
+         select
+        id, market_id marketId,
+        oax.kline.open,
+        oax.kline.close ,
+        high,low,
+        qty,laste_trade_id lasteTradeId,
+        min_type minType,
+        qty,
+        create_time createTime
+        from oax.kline
+        where market_id = #{marketId}
+        and oax.kline.min_type = 1440 ORDER BY create_time desc limit 1
+    </select>
+</mapper>

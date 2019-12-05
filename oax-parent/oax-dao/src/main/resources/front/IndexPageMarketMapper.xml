@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.IndexPageMarketMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.IndexPageMarket">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="sort_no" jdbcType="INTEGER" property="sortNo"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, market_id, sort_no, admin_id, create_time, update_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.index_page_market
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="dealRightManage" resultType="com.oax.entity.front.IndexPageMarket">
+        select
+        i.id,
+        concat(c.short_name, "/", co.short_name) dealTroops,
+        u.name adminName,
+        i.create_time,
+        i.update_time updateTime,
+        i.sort_no,
+        m.id `marketId`
+        from oax.index_page_market i
+        left join oax.market m on m.id = i.market_id
+        left join oax.coin c on c.id = m.coin_id
+        left join oax.market_category mc on mc.id = m.market_category_id
+        left join oax.coin co on mc.coin_id = co.id
+        left join oax_admin.user u on u.id = i.admin_id
+        ORDER BY i.sort_no ASC
+    </select>
+
+    <select id="queryMarketOrCoinId" parameterType="int" resultType="com.oax.entity.admin.MarketCoin">
+        select
+        mc.id mId,
+        c.id cId
+        from oax.index_page_market i
+        left join oax.market m on m.id = i.market_id
+        left join oax.market_category mc on m.market_category_id = mc.id
+        left join oax.coin c on m.coin_id = c.id
+        where i.id = #{id}
+    </select>
+
+    <update id="updateSortNo" parameterType="com.oax.entity.front.IndexPageMarket" flushCache="false">
+        update oax.index_page_market a
+        set a.sort_no = #{sortNo}
+        where a.id = #{id}
+    </update>
+    <select id="findIndexPageMarket" parameterType="int" resultType="int">
+        SELECT
+			a.id marketId
+		FROM
+			oax.index_page_market p
+		LEFT JOIN market a ON a.id = p.market_id
+		JOIN market_category b ON a.market_category_id = b.id
+		WHERE
+			b.is_use = 1
+		AND a.is_show = 1
+		ORDER BY
+			p.sort_no
+    </select>
+
+    <select id="coinList" resultType="com.oax.entity.admin.vo.DealCoinVo">
+        select
+        i.id,
+        m.id marketId,
+        concat(c.short_name, "/", co.short_name) dealTroops
+        from oax.index_page_market i
+        left join oax.market m on m.id = i.market_id
+        left join oax.coin c on c.id = m.coin_id
+        left join oax.market_category mc on mc.id = m.market_category_id
+        left join oax.coin co on mc.coin_id = co.id
+    </select>
+
+
+    <update id="update" parameterType="com.oax.entity.admin.MarketCoin">
+        update oax.index_page_market
+        <set>
+            <if test="marketId != null">
+                market_id = #{marketId},
+            </if>
+            <if test="adminId!=null">
+                admin_id = #{adminId},
+            </if>
+            <if test="sortNo != null">
+                sort_no = #{sortNo},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <select id="selectByMarketId" resultType="com.oax.entity.front.IndexPageMarket">
+       select
+           <include refid="Base_Column_List"/>
+        from oax.index_page_market
+        where market_id = #{marketId}
+
+    </select>
+
+</mapper>

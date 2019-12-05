@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oax.mapper.front.I18nMessageMapper">
+
+    <select id="findList" resultType="com.oax.entity.front.I18nMessage">
+        select * from i18n_msg;
+    </select>
+
+    <insert id="add" parameterType="com.oax.entity.front.I18nMessage">
+        insert into i18n_msg (category_id,code,cn,en)
+        values
+        (#{categoryId,jdbcType=INTEGER},#{code,jdbcType=INTEGER},#{cn,jdbcType=LONGVARCHAR},#{en,jdbcType=LONGVARCHAR})
+    </insert>
+
+</mapper> 

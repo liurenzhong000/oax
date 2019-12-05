@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.EmailCaptchaMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.EmailCaptcha">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="from_email" jdbcType="VARCHAR" property="fromEmail"/>
+        <result column="to_email" jdbcType="VARCHAR" property="toEmail"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, from_email, to_email, code, expire_time, create_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from email_captcha
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectByEmail" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from email_captcha
+        where to_email = #{email,jdbcType=VARCHAR} and expire_time &gt;= now() order by create_time desc limit 0,1
+    </select>
+    <select id="selectEmailByCode" parameterType="java.lang.String" resultType="java.lang.String">
+        select
+        to_email
+        from email_captcha
+        where code = #{emailCode,jdbcType=VARCHAR} and expire_time &gt;= now()
+    </select>
+    
+     <select id="selectByEmailAndCode" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from email_captcha
+        where code = #{emailCode,jdbcType=VARCHAR} and to_email = #{email,jdbcType=VARCHAR} order by id desc limit 0,1
+    </select>
+    
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from email_captcha
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByTime" parameterType="java.lang.String">
+        delete from email_captcha
+        where create_time &lt;= #{endTime,jdbcType=VARCHAR} and create_time &gt;= #{beginTime,jdbcType=VARCHAR}
+    </delete>
+    
+    <insert id="moveToHistory" parameterType="com.oax.entity.front.ErrorPasswordLog">
+        insert into oax_history.email_captcha (from_email, to_email,code, expire_time,create_time)
+        select from_email, to_email,code, expire_time,create_time from email_captcha
+        where create_time &lt;= #{endTime,jdbcType=VARCHAR} and create_time &gt;= #{beginTime,jdbcType=VARCHAR}
+    </insert>
+    
+    <insert id="insert" parameterType="com.oax.entity.front.EmailCaptcha">
+        insert into email_captcha (id, from_email, to_email,
+        code, expire_time, create_time
+        )
+        values (#{id,jdbcType=INTEGER}, #{fromEmail,jdbcType=VARCHAR}, #{toEmail,jdbcType=VARCHAR},
+        #{code,jdbcType=VARCHAR}, #{expireTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.EmailCaptcha">
+        insert into email_captcha
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="fromEmail != null">
+                from_email,
+            </if>
+            <if test="toEmail != null">
+                to_email,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="expireTime != null">
+                expire_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="fromEmail != null">
+                #{fromEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="toEmail != null">
+                #{toEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="expireTime != null">
+                #{expireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.EmailCaptcha">
+        update email_captcha
+        <set>
+            <if test="fromEmail != null">
+                from_email = #{fromEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="toEmail != null">
+                to_email = #{toEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="expireTime != null">
+                expire_time = #{expireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.EmailCaptcha">
+        update email_captcha
+        set from_email = #{fromEmail,jdbcType=VARCHAR},
+        to_email = #{toEmail,jdbcType=VARCHAR},
+        code = #{code,jdbcType=VARCHAR},
+        expire_time = #{expireTime,jdbcType=TIMESTAMP},
+        create_time = #{createTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

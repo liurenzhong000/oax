@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.OrdersRecordMapper">
+    <!--委托管理订单列表 -->
+    <select id="findListByUser" parameterType="java.util.HashMap" resultType="com.oax.entity.front.OrdersRecord">
+       SELECT o.id id,
+	        DATE_FORMAT(o.create_time,'%Y-%m-%d %H:%i:%s') createTime, -- 时间
+	        CONCAT(o.left_coin_name,'/',o.right_coin_name) marketName, -- 交易对名称
+	        o.type, -- 委托类型 买入 卖出
+	        o.price, -- 价格
+	        o.qty, -- 数量
+	        CONCAT(CAST(IF(o.trade_qty = 0,0.00,ROUND(o.trade_qty/o.qty*100,2)) as char(20)),'%') tradeRate, -- 成交比例,
+	        o.price * o.qty money , -- 金额
+	        o.status,
+	        8 priceDecimal,
+	        8 qtyDecimal
+        FROM oax.orders o
+        <where>
+            o.user_id = #{userId}
+            <if test="beginDate!=null and beginDate!=''">
+                and DATE_FORMAT(o.create_time,'%Y-%m-%d') >= #{beginDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                and #{endDate} >= DATE_FORMAT(o.create_time,'%Y-%m-%d')
+            </if>
+            <if test="marketId!=null and marketId!=''">
+                and o.market_id = #{marketId}
+            </if>
+            <if test="type!=null and type!=''">
+                and o.type = #{type}
+            </if>
+            <if test="status!=null and status!=''">
+                <!-- 				and o.status = #{status} -->
+                and o.status in
+                <foreach collection="status.split(',')" item="stu" index="index" open="(" close=")" separator=",">
+                    cast(#{stu} as signed)
+                </foreach>
+            </if>
+        </where>
+        ORDER BY o.id desc
+    </select>
+</mapper>

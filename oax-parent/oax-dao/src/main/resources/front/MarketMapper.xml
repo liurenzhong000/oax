@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.MarketMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.Market">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="market_category_id" jdbcType="INTEGER" property="marketCategoryId"/>
+        <result column="coin_id" jdbcType="INTEGER" property="coinId"/>
+        <result column="price_decimals" jdbcType="INTEGER" property="priceDecimals"/>
+        <result column="qty_decimals" jdbcType="INTEGER" property="qtyDecimals"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="is_show" jdbcType="TINYINT" property="isShow"/>
+        <result column="is_auto_add" jdbcType="TINYINT" property="isAutoAdd"/>
+        <result column="is_mine" jdbcType="TINYINT" property="isMine"/>
+        <result column="sort_num" jdbcType="INTEGER" property="sortNum"/>
+    </resultMap>
+
+    <resultMap id="tradeMap" type="Map">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, market_category_id, coin_id, price_decimals, qty_decimals, create_time, update_time,
+        is_show, is_auto_add, is_mine,sort_num
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.market
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.market
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.Market">
+        insert into oax.market (id, market_category_id, coin_id,
+                                price_decimals, qty_decimals, create_time,
+                                update_time, is_show, is_auto_add, is_mine,sort_num
+        )
+        values (#{id,jdbcType=INTEGER}, #{marketCategoryId,jdbcType=INTEGER}, #{coinId,jdbcType=INTEGER},
+                #{priceDecimals,jdbcType=INTEGER}, #{qtyDecimals,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+                #{updateTime,jdbcType=TIMESTAMP}, #{isShow,jdbcType=TINYINT}, #{isAutoAdd,jdbcType=TINYINT},
+                #{isMine,jdbcType=TINYINT},
+                #{sortNum,jdbcType=INTEGER}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.Market">
+        insert into oax.market
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="marketCategoryId != null">
+                market_category_id,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="priceDecimals != null">
+                price_decimals,
+            </if>
+            <if test="qtyDecimals != null">
+                qty_decimals,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="isShow != null">
+                is_show,
+            </if>
+            <if test="isAutoAdd != null">
+                is_auto_add,
+            </if>
+            <if test="isMine != null">
+                is_mine,
+            </if>
+            <if test="sortNum != null">
+                sort_num,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="marketCategoryId != null">
+                #{marketCategoryId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="priceDecimals != null">
+                #{priceDecimals,jdbcType=INTEGER},
+            </if>
+            <if test="qtyDecimals != null">
+                #{qtyDecimals,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isShow != null">
+                #{isShow,jdbcType=TINYINT},
+            </if>
+            <if test="isAutoAdd != null">
+                #{isAutoAdd,jdbcType=TINYINT},
+            </if>
+            <if test="isMine != null">
+                #{isMine,jdbcType=TINYINT},
+            </if>
+            <if test="sortNum != null">
+                #{sortNum,jdbcType=INTEGER},
+            </if>
+
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.Market">
+        update oax.market
+        <set>
+            <if test="marketCategoryId != null">
+                market_category_id = #{marketCategoryId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                coin_id = #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="priceDecimals != null">
+                price_decimals = #{priceDecimals,jdbcType=INTEGER},
+            </if>
+            <if test="qtyDecimals != null">
+                qty_decimals = #{qtyDecimals,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isShow != null">
+                is_show = #{isShow,jdbcType=TINYINT},
+            </if>
+            <if test="isAutoAdd != null">
+                is_auto_add = #{isAutoAdd,jdbcType=TINYINT},
+            </if>
+            <if test="isMine != null">
+                is_mine = #{isMine,jdbcType=TINYINT},
+            </if>
+            <if test="sortNum != null">
+                sort_num = #{sortNum,jdbcType=INTEGER},
+            </if>
+
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.Market">
+        update oax.market
+        set market_category_id = #{marketCategoryId,jdbcType=INTEGER},
+            coin_id            = #{coinId,jdbcType=INTEGER},
+            price_decimals     = #{priceDecimals,jdbcType=INTEGER},
+            qty_decimals       = #{qtyDecimals,jdbcType=INTEGER},
+            create_time        = #{createTime,jdbcType=TIMESTAMP},
+            update_time        = #{updateTime,jdbcType=TIMESTAMP},
+            is_show            = #{isShow,jdbcType=TINYINT},
+            is_auto_add        = #{isAutoAdd,jdbcType=TINYINT},
+            is_mine        = #{isMine,jdbcType=TINYINT},
+            sort_num           = #{sortNum,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectAll" resultType="com.oax.entity.admin.dto.MarketWithCoin">
+        select
+            mk.id,
+            mk.market_category_id,
+            mk.coin_id,
+            mk.price_decimals,
+            mk.qty_decimals,
+            mk.create_time,
+            mk.update_time,
+            mk.is_show,
+            mk.sort_num,
+            mk.is_auto_add,
+            mk.is_mine,
+            cn.short_name  `coinName`,
+            cn2.short_name `marketCategoryName`
+        from oax.market mk
+            left join oax.market_category mc on mc.id = mk.market_category_id
+            left join oax.coin cn on mk.coin_id = cn.id
+            left join oax.coin cn2 on mc.coin_id = cn2.id
+        order by mk.sort_num
+
+    </select>
+    <select id="selectMarketWithCoinByPrimaryKey" resultType="com.oax.entity.admin.dto.MarketWithCoin">
+
+        select
+            mk.id,
+            mk.market_category_id,
+            mk.coin_id,
+            mk.price_decimals,
+            mk.qty_decimals,
+            mk.create_time,
+            mk.update_time,
+            mk.is_show,
+            mk.sort_num,
+            mk.is_auto_add,
+            mk.is_mine,
+            cn.short_name  `coinName`,
+            cn2.short_name `marketCategoryName`
+        from oax.market mk
+            left join oax.market_category mc on mc.id = mk.market_category_id
+            left join oax.coin cn on mk.coin_id = cn.id
+            left join oax.coin cn2 on mc.coin_id = cn2.id
+        where mk.id = #{marketId}
+    </select>
+    <select id="selectSimpleAll" resultType="com.oax.entity.admin.vo.SimpleMarketsVo">
+        select
+            mk.id          `marketId`,
+            cn.short_name  `coinName`,
+            cn2.short_name `marketCategoryName`
+        from oax.market mk
+            left join oax.market_category mc on mc.id = mk.market_category_id
+            left join oax.coin cn on mk.coin_id = cn.id
+            left join oax.coin cn2 on mc.coin_id = cn2.id
+        where mk.is_show = 1
+        order by mk.sort_num
+    </select>
+
+    <select id="selectAllMarket" parameterType="java.lang.String" resultType="com.oax.entity.front.MarketCoinInfo">
+        SELECT
+        m.id,
+        CONCAT(
+        c.short_name,
+        "/",
+        co.short_name
+        ) marketCoinName
+        FROM
+        market m
+        LEFT JOIN coin c ON m.coin_id = c.id
+        LEFT JOIN market_category mc ON mc.id = m.market_category_id
+        LEFT JOIN coin co ON co.id = mc.coin_id where m.is_show=1 and mc.is_use=1
+        <if test="market != null">
+            and CONCAT(
+            c.short_name,
+            "/",
+            co.short_name
+            )=#{market,jdbcType=VARCHAR}
+        </if>
+        ORDER BY m.sort_num
+    </select>
+
+    <select id="selectAutoAddMarket" resultType="com.oax.entity.front.MarketCoinInfo">
+        SELECT
+            m.id,
+            CONCAT(
+                    c.short_name,
+                    "/",
+                    co.short_name
+            ) marketCoinName
+        FROM
+            market m
+            LEFT JOIN coin c ON m.coin_id = c.id
+            LEFT JOIN market_category mc ON mc.id = m.market_category_id
+            LEFT JOIN coin co ON co.id = mc.coin_id
+        where m.is_show = 1 and mc.is_use = 1 and m.is_auto_add = 1
+        ORDER BY m.sort_num
+    </select>
+
+    <select id="selectMarketInfo" parameterType="java.lang.Integer" resultType="com.oax.entity.front.MarketInformation">
+        SELECT
+            tableA.id,
+            tableA.last,
+            tableA.high,
+            tableA.low,
+            tableA.buy,
+            tableA.sell,
+            tableA.volume,
+            tableA.turnover,
+            tableA.24Price,
+            IF(CAST(tableA.24Price as CHAR) = 0, tableA.24Price, ROUND((tableA.last - tableA.24Price) / tableA.24Price * 100,2)) as changeRate
+        FROM
+            (SELECT
+                 m.id,
+                 IFNULL((select b.price
+                         from trade b
+                         where b.market_id = m.id and
+                               b.create_time >= DATE_SUB(NOW(), INTERVAL 24 hour)
+                         ORDER BY b.id
+                         LIMIT 0, 1), 0)                                                        as 24Price,
+                 IFNULL((SELECT b.price
+                         from trade b
+                         where b.market_id = m.id
+                         ORDER BY
+                             b.id desc
+                         LIMIT 0, 1), 0)                                                        as last,
+                 IFNULL((SELECT MAX(b.price)
+                         from trade b
+                         where b.market_id = m.id and
+                               b.create_time >= DATE_SUB(NOW(), INTERVAL 24 hour)), 0)          as high,
+                 IFNULL((SELECT MIN(b.price)
+                         from trade b
+                         where b.market_id = m.id and
+                               b.create_time >= DATE_SUB(NOW(), INTERVAL 24 hour)), 0)          as low,
+                 IFNULL((SELECT MAX(a.price)
+                         from orders a
+                         where a.market_id = m.id and
+                               a.type = 1 and status &lt; 3 and status > 0), 0)                 as buy,
+                 IFNULL((SELECT MIN(a.price)
+                         from orders a
+                         where a.market_id = m.id and
+                               a.type = 2 and status &lt; 3 and status > 0), 0)                 as sell,
+
+                 IFNULL((SELECT SUM(IFNULL(b.qty, 0))
+                         from trade b
+                         where b.market_id =
+                               m.id and b.create_time >= DATE_SUB(NOW(), INTERVAL 24 hour)), 0) as volume,
+                 IFNULL((SELECT SUM(b.price * b.qty)
+                         from trade b
+                         where b.market_id =
+                               m.id and b.create_time >= DATE_SUB(NOW(), INTERVAL 24 hour)), 0) as turnover
+             FROM
+                 market m
+             where m.id = #{marketId,jdbcType=INTEGER}) tableA
+    </select>
+
+    <select id="getUserTrades" resultType="com.oax.entity.front.TradeRecord">
+        SELECT
+        t.id,
+        t.price,
+        t.qty,
+        (t.price * t.qty) amount,
+        t.create_time,
+        t.create_time createTimeMs,
+        CASE o.type when 1 THEN 'buy' when 2 THEN 'sell' END type
+        FROM
+        trade t
+        LEFT JOIN orders o ON o.id = t.order_id
+        WHERE
+        CONCAT(
+        t.left_coin_name,
+        "/",
+        t.right_coin_name
+        )=#{market,jdbcType=VARCHAR}
+        <if test="userId != null">
+            and o.user_id = #{userId,jdbcType=INTEGER}
+        </if>
+        and t.type=1
+        ORDER BY t.id desc LIMIT 50
+    </select>
+
+    <select id="getMarketIdByName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT m.id
+        FROM
+            market m
+            LEFT JOIN coin c ON m.coin_id = c.id
+            LEFT JOIN market_category mc ON mc.id = m.market_category_id
+            LEFT JOIN coin co ON co.id = mc.coin_id
+        where m.is_show = 1 and mc.is_use = 1 and
+              CONCAT(
+                      c.short_name,
+                      "/",
+                      co.short_name
+              ) = #{market,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByCategoryCoinIdAndMarketCoinId" resultType="com.oax.entity.front.Market">
+        select m.*
+        from oax.market m
+            left join oax.market_category mc on m.market_category_id = mc.id
+        where (m.coin_id = #{marketCoinId} and mc.coin_id = #{categoryCoinId})
+              or (m.coin_id = #{categoryCoinId} and mc.coin_id = #{marketCoinId})
+    </select>
+    <select id="selectByMarketParam" resultType="com.oax.entity.admin.dto.MarketWithCoin">
+        select
+        mk.id,
+        mk.market_category_id,
+        mk.coin_id,
+        mk.price_decimals,
+        mk.qty_decimals,
+        mk.create_time,
+        mk.update_time,
+        mk.is_show,
+        mk.sort_num,
+        mk.is_auto_add,
+        mk.is_mine,
+        cn.short_name `coinName`
+        from oax.market mk
+        left join oax.market_category mc on mc.id = mk.market_category_id
+        left join oax.coin cn on mk.coin_id = cn.id
+        <where>
+            <if test="coinId!=null">
+                and mk.coin_id = #{coinId}
+            </if>
+            <if test="categoryId!=null">
+                and mk.market_category_id = #{categoryId}
+            </if>
+            <if test="startTime!=null and endTime != null">
+                and mk.create_time between #{startTime} and #{endTime}
+            </if>
+        </where>
+        order by mk.sort_num
+    </select>
+
+    <select id="selectByCoinId" parameterType="java.lang.Integer" resultMap="tradeMap">
+        SELECT
+            m.id,
+            CONCAT(
+                    c.short_name,
+                    "/",
+                    c1.short_name
+            ) NAME
+        FROM
+            market m
+            LEFT JOIN coin c ON m.coin_id = c.id
+            LEFT JOIN market_category mc ON mc.id = m.market_category_id
+            LEFT JOIN coin c1 on c1.id = mc.coin_id
+        WHERE
+            m.coin_id = #{coinId,jdbcType=INTEGER} and mc.is_use = 1 and m.is_show = 1
+        ORDER BY
+            m.sort_num
+    </select>
+
+    <select id="selectTradeByCoinId" parameterType="java.lang.Integer" resultType="com.oax.entity.front.TradeMarket">
+        SELECT
+            tableA.id,
+            tableA.NAME,
+            tableA.newPrice,
+            tableA.cnyPrice,
+            tableA.24Price,
+            IF(CAST(tableA.24Price as
+                    CHAR) = 0, tableA.24Price, (tableA.newPrice - tableA.24Price) / tableA.24Price * 100) as rate
+        FROM
+            (SELECT
+                 m.id,
+                 CONCAT(c.short_name, "/", c1.short_name) NAME,
+                 IFNULL((select a.price
+                         from oax.trade a
+                         where a.market_id =
+                               m.id and a.create_time >= DATE_SUB(NOW(), INTERVAL 24 hour)
+                         ORDER BY a.id asc
+                         LIMIT 0, 1), 0) as               24Price,
+                 IFNULL((SELECT b.price
+                         from trade b
+                         where b.market_id = m.id
+                         ORDER BY
+                             b.id desc
+                         LIMIT 0, 1), 0) as               newPrice,
+                 IFNULL((SELECT b.price * mc.cny_price
+                         from trade b
+                         where b.market_id =
+                               m.id
+                         ORDER BY b.id desc
+                         LIMIT 0, 1), 0) as               cnyPrice
+             FROM
+                 market m
+                 LEFT JOIN coin c ON m.coin_id = c.id
+                 LEFT JOIN market_category mc ON mc.id = m.market_category_id
+                 LEFT JOIN coin c1 on c1.id = mc.coin_id
+             WHERE
+                 m.coin_id = #{coinId,jdbcType=INTEGER} and mc.is_use = 1 and m.is_show = 1
+             ORDER BY
+                 m.sort_num) tableA
+    </select>
+    <select id="getMarketList" resultMap="tradeMap">
+        SELECT
+            c.id,
+            CONCAT(c1.short_name, '/', c3.short_name) name
+        FROM
+            oax.market c
+            LEFT JOIN oax.coin c1 ON c1.id = c.coin_id
+            LEFT JOIN oax.market_category c2 ON c2.id = c.market_category_id
+            JOIN oax.coin c3 ON c3.id = c2.coin_id
+        WHERE c2.is_use = 1 and c.is_show = 1
+        ORDER BY
+            c2.sort_num,
+            c.sort_num
+    </select>
+    <select id="getMarketCategoryInfo" resultType="com.oax.entity.front.MarketCategoryInfo">
+        SELECT
+            c.id                                      marketId,
+            CONCAT(c1.short_name, '/', c3.short_name) marketMame,
+            c3.short_name                             categoryName
+        FROM
+            oax.market c
+            LEFT JOIN oax.coin c1 ON c1.id = c.coin_id
+            LEFT JOIN oax.market_category c2 ON c2.id = c.market_category_id
+            JOIN oax.coin c3 ON c3.id = c2.coin_id
+        ORDER BY
+            c2.sort_num,
+            c.sort_num
+    </select>
+
+    <select id="selectListAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.market
+    </select>
+    <select id="allMarketsOnShelf" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.market where is_show = 1
+    </select>
+
+    <select id="selectByType" resultType="com.oax.entity.front.Market">
+        select
+            mt.*,
+            c.id `categoryCoinId`
+        from oax.market mt
+            left join oax.market_category mc
+                on mt.market_category_id = mc.id
+            left join oax.coin c
+                on c.id = mc.coin_id
+        where is_show = #{status}
+    </select>
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.activity.DiceActivityMapper">
+
+    <select id="pageForWebByUserId" resultType="com.oax.entity.front.vo.DiceActivityVo">
+        select
+        da.*,
+        c.short_name AS coinName
+        from dice_activity da
+        join coin c on da.coin_id = c.id
+        where da.user_id = #{userId}
+        <if test="coinId != null"> and da.coin_id = #{coinId}</if>
+        order by id desc
+    </select>
+    <select id="sumAllBetQty" resultType="java.math.BigDecimal">
+        SELECT SUM(bet_qty) FROM dice_activity
+    </select>
+    <select id="sumAllPayoutQty" resultType="java.math.BigDecimal">
+        SELECT SUM(payout_qty) FROM dice_activity
+    </select>
+    <select id="countUser" resultType="java.math.BigDecimal">
+        select count(distinct user_id) from dice_activity
+    </select>
+
+    <select id="statistics" resultType="com.oax.entity.admin.vo.DiceActivityStatisticsVo">
+        select
+        sum(bet_qty) as betQty,
+        sum(payout_qty) as payoutQty,
+        sum(payout_qty-bet_qty) as benefitQty,
+        sum(charges_qty) as chargesQty,
+        user_id
+        from dice_activity
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="coinId != null">
+                and coin_id = #{coinId}
+            </if>
+            <if test="param.startTime != null">
+                and create_time >= #{param.startTime}
+            </if>
+            <if test="param.startTime != null">
+                and #{param.endTime} >= create_time
+            </if>
+        </where>
+        group by user_id
+        order by benefitQty desc
+    </select>
+
+    <select id="statisticsAggre" resultType="com.oax.entity.admin.vo.DiceStatisticsAggreVo">
+        select
+        ifnull(sum(bet_qty), 0) as allBetQty,
+        ifnull(sum(payout_qty), 0) as allPayoutQty,
+        ifnull(sum(bet_qty-payout_qty), 0) as allBenefitQty,
+        ifnull(sum(charges_qty), 0) as allChargesQty,
+        count(*) as countBetTime,
+        count(distinct user_id) as countUser
+        from dice_activity
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="coinId != null">
+                and coin_id = #{coinId}
+            </if>
+            <if test="param.startTime != null">
+                and create_time >= #{param.startTime}
+            </if>
+            <if test="param.endTime != null">
+                and #{param.endTime} >= create_time
+            </if>
+        </where>
+    </select>
+
+    <select id="pageForAdmin" resultType="com.oax.entity.activity.DiceActivity">
+        select
+        *
+        from dice_activity
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="coinId != null">
+                and coin_id = #{coinId}
+            </if>
+            <if test="param.startTime != null">
+                and create_time >= #{param.startTime}
+            </if>
+            <if test="param.endTime != null">
+                and #{param.endTime} >= create_time
+            </if>
+        </where>
+        order by id desc
+    </select>
+    <select id="statisticsByUserIds" resultType="com.oax.entity.admin.vo.DiceActivityStatisticsVo">
+        select
+        sum(bet_qty) as betQty,
+        sum(payout_qty) as payoutQty,
+        sum(payout_qty-bet_qty) as benefitQty,
+        sum(charges_qty) as chargesQty,
+        user_id
+        from dice_activity
+        <where>
+            user_id in
+            <foreach collection="userIds" item="item" index="index"  separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            <if test="coinId != null">
+                and coin_id = #{coinId}
+            </if>
+            <if test="param.startTime != null">
+                and create_time >= #{param.startTime}
+            </if>
+            <if test="param.startTime != null">
+                and #{param.endTime} >= create_time
+            </if>
+        </where>
+        group by user_id
+        order by benefitQty desc
+    </select>
+
+</mapper>

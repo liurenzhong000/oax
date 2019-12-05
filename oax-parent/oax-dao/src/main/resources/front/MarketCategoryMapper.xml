@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.MarketCategoryMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.MarketCategory">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="coin_id" jdbcType="INTEGER" property="coinId"/>
+        <result column="cny_price" jdbcType="DECIMAL" property="cnyPrice"/>
+        <result column="usdt_price" jdbcType="DECIMAL" property="usdtPrice"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName"/>
+        <result column="sort_num" jdbcType="INTEGER" property="sortNum"/>
+        <result column="is_use" jdbcType="TINYINT" property="isUse"/>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, coin_id,  cny_price, usdt_price, create_time, update_time, category_name,
+        sort_num, is_use, remarks
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax.market_category
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.market_category
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.MarketCategory">
+        insert into oax.market_category (id, coin_id,
+        cny_price, usdt_price, create_time,
+        update_time,
+        sort_num, is_use, remarks
+        )
+        values (#{id,jdbcType=INTEGER}, #{coinId,jdbcType=INTEGER},
+        #{cnyPrice,jdbcType=DECIMAL}, #{usdtPrice,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP},
+        #{sortNum,jdbcType=INTEGER}, #{isUse,jdbcType=TINYINT}, #{remarks,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.MarketCategory">
+        insert into oax.market_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+
+            <if test="cnyPrice != null">
+                cny_price,
+            </if>
+            <if test="usdtPrice != null">
+                usdt_price,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+
+            <if test="sortNum != null">
+                sort_num,
+            </if>
+            <if test="isUse != null">
+                is_use,
+            </if>
+            <if test="remarks != null">
+                remarks,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+
+            <if test="cnyPrice != null">
+                #{cnyPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="usdtPrice != null">
+                #{usdtPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sortNum != null">
+                #{sortNum,jdbcType=INTEGER},
+            </if>
+            <if test="isUse != null">
+                #{isUse,jdbcType=TINYINT},
+            </if>
+            <if test="remarks != null">
+                #{remarks,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.MarketCategory">
+        update oax.market_category
+        <set>
+            <if test="coinId != null">
+                coin_id = #{coinId,jdbcType=INTEGER},
+            </if>
+
+            <if test="cnyPrice != null">
+                cny_price = #{cnyPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="usdtPrice != null">
+                usdt_price = #{usdtPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sortNum != null">
+                sort_num = #{sortNum,jdbcType=INTEGER},
+            </if>
+            <if test="isUse != null">
+                is_use = #{isUse,jdbcType=TINYINT},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.MarketCategory">
+        update oax.market_category
+        set coin_id = #{coinId,jdbcType=INTEGER},
+        cny_price = #{cnyPrice,jdbcType=DECIMAL},
+        usdt_price = #{usdtPrice,jdbcType=DECIMAL},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+
+        sort_num = #{sortNum,jdbcType=INTEGER},
+        is_use = #{isUse,jdbcType=TINYINT},
+        remarks = #{remarks,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectAll" resultType="com.oax.entity.front.MarketCategory">
+
+        select mc.id,
+        mc.coin_id,
+        mc.usdt_price,
+        mc.cny_price,
+        mc.sort_num,
+        mc.is_use,
+        mc.remarks,
+        mc.update_time,
+        mc.create_time,
+        cn.short_name `category_name`
+        from oax.market_category mc
+        left join oax.coin cn on cn.id = mc.coin_id
+        order by sort_num
+    </select>
+
+    <select id="selectAllBySort" resultType="com.oax.entity.front.MarketCategory">
+        SELECT a.id,
+        a.coin_id coinId,
+        b.short_name categoryName
+        FROM oax.market_category a left JOIN oax.coin b on a.coin_id = b.id
+        where a.is_use = 1
+        ORDER BY a.sort_num
+    </select>
+    <select id="selectAllBySortToAll" resultType="com.oax.entity.front.MarketCategory">
+        SELECT a.id,
+        a.coin_id coinId,
+        b.short_name categoryName
+        FROM oax.market_category a left JOIN oax.coin b on a.coin_id = b.id
+        ORDER BY a.sort_num
+    </select>
+
+    <select id="findSimpleMarketCategoryById"
+            resultType="com.oax.entity.admin.vo.SimpleMarketCategoryVo">
+        select
+        mc.id,
+        cn.short_name categoryName
+        FROM oax.market_category mc
+        left join oax.coin cn on cn.id = mc.coin_id
+        where mc.id = #{marketCategoryId}
+    </select>
+    <select id="selectAllSimpleMarketCategory"
+            resultType="com.oax.entity.admin.vo.SimpleMarketCategoryVo">
+        select
+        mc.id,
+        cn.short_name `category_name`
+        from oax.market_category mc
+        left join oax.coin cn on cn.id = mc.coin_id
+    </select>
+    <select id="selectById" resultType="com.oax.entity.front.MarketCategory">
+        select mc.id,
+        mc.coin_id,
+        mc.usdt_price,
+        mc.cny_price,
+        mc.sort_num,
+        mc.is_use,
+        mc.remarks,
+        mc.update_time,
+        mc.create_time,
+        cn.short_name `category_name`
+        from oax.market_category mc
+        left join oax.coin cn on cn.id = mc.coin_id
+        where mc.id = #{categoryId}
+    </select>
+
+    <select id="selectByCoinId" resultType="com.oax.entity.front.MarketCategory">
+        select mc.id,
+        mc.coin_id,
+        mc.usdt_price,
+        mc.cny_price,
+        mc.sort_num,
+        mc.is_use,
+        mc.remarks,
+        mc.update_time,
+        mc.create_time
+        from oax.market_category mc
+        where mc.coin_id = #{coin_id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getUsdtCnyPrice" resultType="java.math.BigDecimal">
+      select cny_price from market_category where coin_id = 10
+    </select>
+
+    <update id="updateByCoinIdSelective" parameterType="com.oax.entity.front.MarketCategory">
+        update oax.market_category
+        <set>
+            <if test="cnyPrice != null">
+                cny_price = #{cnyPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="usdtPrice != null">
+                usdt_price = #{usdtPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sortNum != null">
+                sort_num = #{sortNum,jdbcType=INTEGER},
+            </if>
+            <if test="isUse != null">
+                is_use = #{isUse,jdbcType=TINYINT},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where  coin_id= #{coinId,jdbcType=INTEGER}
+    </update>
+
+</mapper>

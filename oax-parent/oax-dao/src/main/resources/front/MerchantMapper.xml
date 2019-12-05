@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.ctc.MerchantMapper">
+
+    <resultMap type="com.oax.entity.admin.vo.MerchantVo" id="MerchantVoMap">
+        <result column="payment_way" property="paymentWay" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+    </resultMap>
+
+    <select id="pageForAdmin" resultMap="MerchantVoMap" parameterType="com.oax.entity.admin.param.MerchantParam">
+        SELECT
+        m.*,
+        IFNULL(u.phone, u.email) AS userName,
+        u.id_name,
+        u.freezing
+        FROM
+        merchant m
+        JOIN `user` u ON u.id = m.user_id
+        where m.status = 0
+        <if test="id != null">and m.id = #{id} </if>
+        <if test="userId != null">AND m.user_id = #{userId} </if>
+        <if test="startTime != null">
+            and m.create_date &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and m.create_date &lt;= #{endTime}
+        </if>
+    </select>
+
+    <select id="selectByUserId" resultType="com.oax.entity.ctc.Merchant">
+        select * from merchant where user_id = #{userId} and `status` = 0
+    </select>
+
+    <select id="pageForAdminByCtcOrderId" resultMap="MerchantVoMap" parameterType="com.oax.entity.admin.param.MerchantParam">
+        SELECT
+        DISTINCT
+        m.*,
+        IFNULL(u.email, u.phone ) AS userName,
+        u.id_name,
+        u.freezing
+        FROM
+        ctc_order co
+        JOIN `user` u ON (u.id = co.from_user_id OR u.id = to_user_id) AND merchant = 1
+        JOIN merchant m ON u.id = m.user_id
+        where co.id = #{ctcOrderId}
+        and m.status = 0
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

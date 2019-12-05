@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.InvitingFeedbackMapper">
+    <select id="pullInvitingFeedbackList" resultType="com.oax.entity.front.InvitingFeedback">
+        SELECT SUM(fff.qty)*0.2 qty, fff.from_user_id userId  from
+        (SELECT ff.user_id,ff.qty,u.from_user_id from
+                (SELECT f.user_id, SUM(qty) qty from
+                    (
+                        SELECT user_id,SUM(qty)qty from oax.trade_feedback FORCE INDEX(idx_tradefeedback_create_time) where create_time >=#{beginTime} and #{endTime}>create_time GROUP BY user_id
+                        UNION ALL
+                        select user_id,qty from oax.order_feedback where create_time >=#{beginTime} and #{endTime}>create_time AND qty>0) f GROUP BY f.user_id
+                ) ff
+            JOIN oax.user u on u.id = ff.user_id  and u.from_user_id is not null) fff GROUP BY fff.from_user_id
+    </select>
+    <insert id="save" parameterType="com.oax.entity.front.InvitingFeedback">
+    INSERT INTO oax.Inviting_feedback
+        (
+        user_id,
+        qty,
+        create_time
+        )
+        VALUES
+        (
+        #{userId},
+        #{qty},
+        now()
+        )
+    </insert>
+    <select id="getMyInvitingFeedback" resultType="java.math.BigDecimal">
+        select IFNULL(TRUNCATE(sum(qty),8),0) from oax.Inviting_feedback where user_id = #{userId}
+        and create_time >= #{beginTime} and #{endTime} > create_time
+    </select>
+</mapper>

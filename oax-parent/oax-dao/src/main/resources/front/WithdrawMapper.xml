@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.WithdrawMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.Withdraw">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="coin_id" jdbcType="INTEGER" property="coinId"/>
+        <result column="from_address" jdbcType="VARCHAR" property="fromAddress"/>
+        <result column="to_address" jdbcType="VARCHAR" property="toAddress"/>
+        <result column="qty" jdbcType="DECIMAL" property="qty"/>
+        <result column="btc_price" jdbcType="DECIMAL" property="btcPrice"/>
+        <result column="fee" jdbcType="DECIMAL" property="fee"/>
+        <result column="tx_id" jdbcType="VARCHAR" property="txId"/>
+        <result column="tx_fee" jdbcType="DECIMAL" property="txFee"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="confirm_time" jdbcType="TIMESTAMP" property="confirmTime"/>
+        <result column="gas_price" jdbcType="INTEGER" property="gasPrice"/>
+        <result column="gas_limit" jdbcType="INTEGER" property="gasLimit"/>
+        <result column="remark" jdbcType="LONGVARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, coin_id, from_address, to_address, qty, btc_price, fee, tx_id, tx_fee, status,
+        create_time, update_time, confirm_time, gas_price, gas_limit
+    </sql>
+    <sql id="Blob_Column_List">
+        remark
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax.withdraw
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.withdraw
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.Withdraw">
+        insert into oax.withdraw (id, user_id, coin_id,
+                                  from_address, to_address, qty,
+                                  fee, tx_id, tx_fee, status,
+                                  create_time, update_time, confirm_time,
+                                  gas_price, gas_limit, remark
+        )
+        values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{coinId,jdbcType=INTEGER},
+                                        #{fromAddress,jdbcType=VARCHAR}, #{toAddress,jdbcType=VARCHAR},
+                                        #{qty,jdbcType=DECIMAL},
+                                        #{fee,jdbcType=DECIMAL}, #{txId,jdbcType=VARCHAR}, #{txFee,jdbcType=DECIMAL},
+                                        #{status,jdbcType=TINYINT},
+                                        #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+                #{confirmTime,jdbcType=TIMESTAMP},
+                #{gasPrice,jdbcType=INTEGER}, #{gasLimit,jdbcType=INTEGER}, #{remark,jdbcType=LONGVARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.Withdraw">
+        insert into oax.withdraw
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="fromAddress != null">
+                from_address,
+            </if>
+            <if test="toAddress != null">
+                to_address,
+            </if>
+            <if test="qty != null">
+                qty,
+            </if>
+            <if test="btcPrice != null">
+                btc_price,
+            </if>
+            <if test="fee != null">
+                fee,
+            </if>
+            <if test="txId != null">
+                tx_id,
+            </if>
+            <if test="txFee != null">
+                tx_fee,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="confirmTime != null">
+                confirm_time,
+            </if>
+            <if test="gasPrice != null">
+                gas_price,
+            </if>
+            <if test="gasLimit != null">
+                gas_limit,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="fromAddress != null">
+                #{fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="toAddress != null">
+                #{toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="qty != null">
+                #{qty,jdbcType=DECIMAL},
+            </if>
+            <if test="btcPrice != null">
+                #{btcPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="fee != null">
+                #{fee,jdbcType=DECIMAL},
+            </if>
+            <if test="txId != null">
+                #{txId,jdbcType=VARCHAR},
+            </if>
+            <if test="txFee != null">
+                #{txFee,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="confirmTime != null">
+                #{confirmTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gasPrice != null">
+                #{gasPrice,jdbcType=INTEGER},
+            </if>
+            <if test="gasLimit != null">
+                #{gasLimit,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.Withdraw">
+        update oax.withdraw
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                coin_id = #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="fromAddress != null">
+                from_address = #{fromAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="toAddress != null">
+                to_address = #{toAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="qty != null">
+                qty = #{qty,jdbcType=DECIMAL},
+            </if>
+            <if test="fee != null">
+                fee = #{fee,jdbcType=DECIMAL},
+            </if>
+            <if test="txId != null">
+                tx_id = #{txId,jdbcType=VARCHAR},
+            </if>
+            <if test="txFee != null">
+                tx_fee = #{txFee,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="confirmTime != null">
+                confirm_time = #{confirmTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gasPrice != null">
+                gas_price = #{gasPrice,jdbcType=INTEGER},
+            </if>
+            <if test="gasLimit != null">
+                gas_limit = #{gasLimit,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.Withdraw">
+        update oax.withdraw
+        set user_id      = #{userId,jdbcType=INTEGER},
+            coin_id      = #{coinId,jdbcType=INTEGER},
+            from_address = #{fromAddress,jdbcType=VARCHAR},
+            to_address   = #{toAddress,jdbcType=VARCHAR},
+            qty          = #{qty,jdbcType=DECIMAL},
+            fee          = #{fee,jdbcType=DECIMAL},
+            tx_id        = #{txId,jdbcType=VARCHAR},
+            tx_fee       = #{txFee,jdbcType=DECIMAL},
+            status       = #{status,jdbcType=TINYINT},
+            create_time  = #{createTime,jdbcType=TIMESTAMP},
+            update_time  = #{updateTime,jdbcType=TIMESTAMP},
+            confirm_time = #{confirmTime,jdbcType=TIMESTAMP},
+            gas_price    = #{gasPrice,jdbcType=INTEGER},
+            gas_limit    = #{gasLimit,jdbcType=INTEGER},
+            remark       = #{remark,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getByUserIdQueryWithdraw" parameterType="com.oax.entity.admin.param.RechargesOrWithdrawParam"
+            resultType="com.oax.entity.admin.vo.WithdrawsVo">
+        select w.id, c.short_name shortName,
+        w.qty qty, w.fee fee, w.from_address fromAddress, w.to_address toAddress, w.create_time createTime,w.tx_id
+        `txHashId`,
+        u.id `userId`
+        from oax.withdraw w
+        left join oax.coin c on w.coin_id = c.id
+        left join oax.user u on w.user_id = u.id
+        where w.user_id = #{userId}
+        <if test="coinId != null and coinId != ''">
+            and c.id = #{coinId}
+        </if>
+        <if test="beginTime != null">
+            and w.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and w.create_time &lt;= #{endTime}
+        </if>
+        order by
+        w.update_time DESC
+    </select>
+
+
+    <select id="getByUserIdWithdraw" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax.withdraw
+        where user_id = #{userId} order by create_time desc
+    </select>
+
+
+    <select id="getByWithdrawPageParam" resultType="com.oax.entity.admin.vo.WithdrawPageVo">
+        select
+        wd.id `id`,
+        wd.user_id `user_id`,
+        us.phone `phone`,
+        us.email `email`,
+        cn.short_name `coin_name`,
+        wd.qty `qty`,
+        wd.fee `fee`,
+        wd.to_address `to_address`,
+        wd.update_time `update_time`,
+        wd.create_time `create_time`,
+        wd.status `status`,
+        wd.tx_id `tx_id`
+        from
+        oax.withdraw wd
+        left join oax.user us on wd.user_id = us.id
+        left join oax.coin cn on wd.coin_id = cn.id
+        <where>
+            <if test="userId!=null">
+                and wd.user_id = #{userId}
+            </if>
+            <if test="coinId!=null">
+                and wd.coin_id = #{coinId}
+            </if>
+            <if test="username!=null">
+                and (us.email like concat('%',#{username},'%') or us.phone like concat('%',#{username},'%'))
+            </if>
+            <if test="withdrawStatus!=null">
+                <if test="withdrawStatus==2">
+                    and (wd.status >= 2 or wd.status = -3)
+                </if>
+                <if test="withdrawStatus!=2">
+                    and wd.status = #{withdrawStatus}
+                </if>
+            </if>
+            <if test="startTime != null and endTime!= null">
+                and wd.create_time between #{startTime} and #{endTime}
+            </if>
+            <if test="startNumber != null and endNumber!= null">
+                and wd.qty between #{startNumber} and #{endNumber}
+            </if>
+        </where>
+        order by
+        <if test="sortQty != null">
+            <if test="sortQty == 0">
+                wd.qty
+            </if>
+            <if test="sortQty == 1">
+                wd.qty desc
+            </if>
+        </if>
+        <if test="sortQty == null">
+            <if test="withdrawStatus==0 or withdrawStatus==1">
+                wd.create_time
+            </if>
+            <if test="withdrawStatus!=0 and withdrawStatus!=1">
+                wd.update_time DESC
+            </if>
+        </if>
+    </select>
+    <select id="countWithdrawSumsByParam" resultType="com.oax.entity.admin.vo.WithdrawSums">
+        select
+        sum(wd.qty) `countQty`,
+        sum(wd.fee) `countFee`
+        from
+        oax.withdraw wd
+        left join oax.user us on wd.user_id = us.id
+        <where>
+            <if test="userId!=null">
+                and wd.user_id = #{userId}
+            </if>
+            <if test="coinId!=null">
+                and wd.coin_id = #{coinId}
+            </if>
+            <if test="username!=null">
+                and (us.email like concat('%',#{username},'%') or us.phone like concat('%',#{username},'%'))
+            </if>
+            <if test="withdrawStatus!=null">
+                and wd.status = #{withdrawStatus}
+            </if>
+            <if test="startTime != null and endTime!= null">
+                and wd.create_time between #{startTime} and #{endTime}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectByUserId" parameterType="hashMap" resultType="com.oax.entity.front.WithdrawResult">
+        select w.id, c.short_name shortName,c.image,w.qty qty, w.from_address fromAddress, w.to_address toAddress,
+        w.create_time createTime,w.status,w.fee,(w.qty-w.fee) actuallyQty,w.update_time,w.tx_id
+        from oax.withdraw w
+        left join oax.coin c on w.coin_id = c.id
+        left join oax.user u on w.user_id = u.id
+        where w.user_id = #{userId}
+        <if test="coinName != null and coinName != ''">
+            and c.short_name like concat('%',#{coinName},'%')
+        </if>
+        <if test="status != null">
+            and w.status in
+            <foreach collection="status" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by w.create_time desc
+    </select>
+    <select id="selectByStatus" resultType="com.oax.entity.front.Withdraw">
+
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax.withdraw
+        where status = #{inTxpoolStatus}
+    </select>
+    <select id="selectByHash" resultType="com.oax.entity.front.Withdraw">
+
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax.withdraw
+        where tx_id= #{hash}
+
+    </select>
+
+    <select id="selectByCoinIdAndStatus" resultType="com.oax.entity.front.Withdraw">
+
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax.withdraw
+        where status = #{status}
+        and coin_id = #{coinId}
+    </select>
+    <select id="selectOutByCoinIdAndTime" resultType="com.oax.entity.front.Withdraw">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax.withdraw
+        where coin_id = #{coinId}
+        and confirm_time >= #{startTime}
+        and #{endTime} >= confirm_time
+    </select>
+
+    <select id="queryUseredWithdraw" resultType="java.math.BigDecimal" parameterType="java.lang.Integer">
+        SELECT IFNULL(sum(btc_price), 0) useredWithdrawal
+        FROM withdraw
+        where user_id = #{userId,jdbcType=INTEGER} AND status >= 0
+              AND IF(status = 0, date(create_time) = curdate(), date(update_time) = curdate())
+    </select>
+    <select id="sumWithdrawFee" resultType="com.oax.entity.admin.vo.WithdrawFeeVo">
+        select
+        sum(w.fee) `fee`,
+        c.id `coinId`,
+        c.short_name `coinName`
+        from oax.withdraw w left join oax.coin c
+        on w.coin_id = c.id
+        <where>
+            w.status > 1
+            <if test="coinId!=null">
+                and w.coin_id = #{coinId}
+            </if>
+        </where>
+        group by w.coin_id
+    </select>
+    <select id="selectSumVoOutByCoinIdAndTime" resultType="com.oax.entity.front.vo.WithdrawSumVo">
+        select
+        qty,fee,tx_fee
+        from oax.withdraw
+        where coin_id = #{coinId}
+        and confirm_time >= #{startTime}
+        and #{endTime} >= confirm_time
+    </select>
+</mapper>

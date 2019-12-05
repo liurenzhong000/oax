@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.BenchMarkShareBonusMapper">
+    <select id="getBenchMarkShareBonusList" resultType="com.oax.entity.front.BenchMarkShareBonus">
+        SELECT t1.fee qty,t1.fee_coin_id coinId from
+        (SELECT t.fee_coin_id,SUM(fee)fee from oax.trade t FORCE INDEX(idx_trade_create_time)
+        left JOIN oax.market m on m.id = t.market_id where m.is_mine=1 AND t.create_time >=#{beginTime} and #{endTime} >t.create_time group BY t.fee_coin_id) t1
+        JOIN (SELECT coin_id from oax.market_category ) mc on mc.coin_id = t1.fee_coin_id
+    </select>
+    <select id="getUserCoinXThreshold" resultType="com.oax.entity.front.UserCoin" parameterType="integer">
+        SELECT uc.user_id userId,uc.banlance from oax.user u
+         JOIN
+        (SELECT user_id,banlance from oax.user_coin where coin_id =3 and banlance>=#{banlance}) uc
+        on u.id = uc.user_id  and u.level=2
+    </select>
+    <select id="getUserCoinXNonThreshold" resultType="com.oax.entity.front.UserCoin">
+        SELECT user_id userId,banlance from oax.user_coin where coin_id =3 and banlance>0
+    </select>
+    <insert id="insert" parameterType="com.oax.entity.front.BenchMarkShareBonus">
+        insert into oax.benchmark_sharebonus
+        (user_id, coin_id, type, qty, create_time)
+        values
+        (#{userId},#{coinId},#{type},#{qty},#{createTime})
+    </insert>
+    <select id="getTradeListXThreshold" resultType="com.oax.entity.front.BenchMarkShareBonus">
+      SELECT t.user_id userId,t.right_coin_id coinId,t.amount qty from
+        (SELECT t1.user_id,t1.right_coin_id,SUM(t1.price*t1.qty) amount FROM  oax.trade t1 FORCE INDEX(idx_trade_create_time)
+          JOIN
+          oax.market m on m.id = t1.market_id and m.is_mine=1
+          where t1.create_time >= #{beginTime} and #{endTime} > t1.create_time group BY right_coin_id,user_id) t
+        JOIN(
+        SELECT uc.user_id  from oax.user u
+                 JOIN
+                (SELECT user_id from oax.user_coin where coin_id =3 and banlance>=#{banlance}) uc
+                on u.id = uc.user_id  and u.level=2
+        )f
+        on t.user_id = f.user_id
+        ORDER BY t.user_id,t.right_coin_id
+    </select>
+    <select id="getTradeListXNonThreshold" resultType="com.oax.entity.front.BenchMarkShareBonus">
+        SELECT t.user_id userId,t.right_coin_id coinId,t.amount qty from
+        (SELECT t1.user_id,t1.right_coin_id,SUM(t1.price*t1.qty) amount FROM  oax.trade t1 FORCE INDEX(idx_trade_create_time)
+          JOIN
+          oax.market m on m.id = t1.market_id and m.is_mine=1
+          where t1.create_time >= #{beginTime} and #{endTime} > t1.create_time group BY right_coin_id,user_id) t
+        JOIN(
+           SELECT user_id from oax.user_coin where coin_id =3 and banlance>0
+        )f
+        on t.user_id = f.user_id
+        ORDER BY t.user_id,t.right_coin_id
+    </select>
+    <select id="getShareBonusInfoList" resultType="com.oax.entity.front.ShareBonusInfo">
+        SELECT t1.fee_coin_id coinId,
+               c.short_name coinName,
+               TRUNCATE(t1.fee,8) toDayQty,
+               TRUNCATE(t2.fee,8) FridayQty,
+               TRUNCATE(t3.fee,8) MondayQty
+        from
+                (SELECT t.fee_coin_id,SUM(fee)fee from oax.trade t FORCE INDEX(idx_trade_create_time)
+                left JOIN oax.market m on m.id = t.market_id where m.is_mine=1 AND t.create_time >=#{toDay} and #{nextDay} >t.create_time group BY t.fee_coin_id) t1
+        JOIN (SELECT coin_id from oax.market_category ) mc on mc.coin_id = t1.fee_coin_id
+
+        JOIN
+        (SELECT t.fee_coin_id,SUM(fee)fee from oax.trade t FORCE INDEX(idx_trade_create_time)
+                left JOIN oax.market m on m.id = t.market_id where m.is_mine=1 AND t.create_time >=#{lastFriday} and #{currentFriday}>t.create_time group BY t.fee_coin_id) t2
+        on t2.fee_coin_id = mc.coin_id
+        JOIN
+        (SELECT t.fee_coin_id,SUM(fee)fee from oax.trade t FORCE INDEX(idx_trade_create_time)
+                left JOIN oax.market m on m.id = t.market_id where m.is_mine=1 AND t.create_time >=#{currentMonday} and #{nextMonday} >t.create_time group BY t.fee_coin_id) t3
+        on t3.fee_coin_id = mc.coin_id
+        JOIN oax.coin c on c.id = mc.coin_id
+    </select>
+    <select id="getShareBonus" resultType="java.util.Map" parameterType="com.oax.entity.admin.param.ShareBonusParam">
+        SELECT t1.fee_coin_id coinId,
+               c.short_name coinName,
+               TRUNCATE(t1.fee,8) toDayQty
+        from
+            (SELECT t.fee_coin_id,SUM(fee)fee from oax.trade t FORCE INDEX(idx_trade_create_time)
+            left JOIN oax.market m on m.id = t.market_id where m.is_mine=1
+            <if test="beginTime!=null">
+                AND t.create_time >=#{beginTime}
+            </if>
+            <if test="endTime!=null">
+                and #{endTime} >=t.create_time
+            </if>
+            group BY t.fee_coin_id) t1
+        JOIN (SELECT coin_id from oax.market_category ) mc on mc.coin_id = t1.fee_coin_id
+        JOIN oax.coin c on c.id = mc.coin_id
+    </select>
+    <select id="getMyShareBonus" resultType="java.util.Map">
+        SELECT c.id coinId,c.short_name coinName,IFNULL(f.qty,0)qty from  oax.market_category  mc
+        LEFT JOIN oax.coin c on mc.coin_id = c.id
+        LEFT JOIN
+        (SELECT coin_id,SUM(qty)qty from oax.benchmark_sharebonus where user_id =#{userId} and create_time >=#{beginTime} and
+          #{endTime} > create_time GROUP BY coin_id) f
+        ON mc.coin_id = f.coin_id
+    </select>
+    <select id="ShareBonusIndex" resultType="java.util.Map" parameterType="com.oax.entity.admin.vo.FeedBackVo">
+        SELECT c.id coinId,c.short_name coinName,IFNULL(TRUNCATE(t.qty,8),0)qty from oax.coin c
+        LEFT JOIN
+        (select fee_coin_id,SUM(fee) qty from oax.trade where create_time >= #{beginTime} and  #{endTime} >= create_time group BY fee_coin_id) t
+        on c.id = t.fee_coin_id
+    </select>
+    <select id="getPage" resultType="java.util.Map" parameterType="com.oax.entity.admin.param.ShareBonusParam">
+        select c.id coinId,c.short_name coinName,IFNULL(t.qty,0)qty from
+        (SELECT id,short_name from  oax.coin where id not in (select coin_id from oax.market_category)) c
+        LEFT JOIN
+        (SELECT fee_coin_id,SUM(fee) qty from oax.trade
+        <where>
+           <if test="beginTime!=null">
+               create_time >= #{beginTime}
+           </if>
+           <if test="endTime!=null">
+               and #{endTime}>=create_time
+           </if>
+        </where>
+        GROUP BY fee_coin_id) t
+        on t.fee_coin_id = c.id
+    </select>
+    <insert id="batchSaveTradeRedman" parameterType="java.util.List">
+        INSERT INTO oax.trade_redman
+        (user_id,amount,create_time)
+        VALUES
+        <foreach collection="list" item="item" separator="," index="index">
+            (
+            #{item.userId},
+            #{item.qty},
+            now()
+            )
+        </foreach>
+    </insert>
+    <select id="getMarKetShareBonusList" resultType="java.util.Map">
+        SELECT
+            m.market_id marketId,
+            CONCAT(c3.short_name,'/',c2.short_name) marketName,
+            TRUNCATE(m.qty,8) qty,
+            m.fee_coin_id feeCoinId,
+            c1.short_name feeCoinName
+        FROM
+        (select t.market_id,t.fee_coin_id,IFNULL(SUM(t.fee),0)qty from  trade t FORCE INDEX(idx_trade_create_time)
+        JOIN oax.market_category mc on mc.coin_id = t.fee_coin_id
+        where t.create_time >=#{beginTime} and #{endTime} > t.create_time
+        GROUP BY t.market_id,t.fee_coin_id) m
+        LEFT JOIN oax.market m1 on m.market_id =m1.id
+        LEFT JOIN oax.coin c1 on c1.id = m.fee_coin_id
+        LEFT JOIN oax.market_category mc1 on mc1.id = m1.market_category_id
+        LEFT JOIN oax.coin c2 on c2.id = mc1.coin_id
+        LEFT JOIN oax.coin c3 on c3.id = m1.coin_id
+        where m1.is_mine=1 ORDER BY m.fee_coin_id
+    </select>
+</mapper>

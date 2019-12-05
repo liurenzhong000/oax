@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.admin.WithdrawLogMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.admin.WithdrawLog">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="withdraw_id" jdbcType="INTEGER" property="withdrawId"/>
+        <result column="admin_id" jdbcType="INTEGER" property="adminId"/>
+        <result column="admin_name" jdbcType="VARCHAR" property="adminName"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.oax.entity.admin.WithdrawLog">
+        <result column="remark" jdbcType="LONGVARCHAR" property="remark"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, withdraw_id, admin_id, admin_name, create_time,description
+    </sql>
+    <sql id="Blob_Column_List">
+        remark
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax_admin.withdraw_log
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax_admin.withdraw_log
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.admin.WithdrawLog">
+        insert into oax_admin.withdraw_log (id, withdraw_id, admin_id,
+        admin_name, create_time, remark,description
+        )
+        values (#{id,jdbcType=INTEGER}, #{withdrawId,jdbcType=INTEGER}, #{adminId,jdbcType=INTEGER},
+        #{adminName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=LONGVARCHAR}
+        ,#{description,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.admin.WithdrawLog">
+        insert into oax_admin.withdraw_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="withdrawId != null">
+                withdraw_id,
+            </if>
+            <if test="adminId != null">
+                admin_id,
+            </if>
+            <if test="adminName != null">
+                admin_name,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+
+            <if test="description != null">
+                description,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="withdrawId != null">
+                #{withdrawId,jdbcType=INTEGER},
+            </if>
+            <if test="adminId != null">
+                #{adminId,jdbcType=INTEGER},
+            </if>
+            <if test="adminName != null">
+                #{adminName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.admin.WithdrawLog">
+        update oax_admin.withdraw_log
+        <set>
+            <if test="withdrawId != null">
+                withdraw_id = #{withdrawId,jdbcType=INTEGER},
+            </if>
+            <if test="adminId != null">
+                admin_id = #{adminId,jdbcType=INTEGER},
+            </if>
+            <if test="adminName != null">
+                admin_name = #{adminName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=LONGVARCHAR},
+            </if>
+
+            <if test="description != null">
+                description = #{adminName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.oax.entity.admin.WithdrawLog">
+        update oax_admin.withdraw_log
+        set withdraw_id = #{withdrawId,jdbcType=INTEGER},
+        admin_id = #{adminId,jdbcType=INTEGER},
+        admin_name = #{adminName,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        remark = #{remark,jdbcType=LONGVARCHAR},
+        description = #{description,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.admin.WithdrawLog">
+        update oax_admin.withdraw_log
+        set withdraw_id = #{withdrawId,jdbcType=INTEGER},
+        admin_id = #{adminId,jdbcType=INTEGER},
+        admin_name = #{adminName,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        description = #{description,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectByWithdrawById" resultType="com.oax.entity.admin.WithdrawLog">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax_admin.withdraw_log
+        where withdraw_id = #{withdrawId}
+    </select>
+
+</mapper>

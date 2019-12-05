@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.activity.SnatchDetailMapper">
+
+    <update id="updateAllNotWin">
+        update snatch_detail set payout_qty = 0,status=1 where activity_id = #{snatchActivityId}
+    </update>
+
+    <update id="updateWin">
+        <foreach collection="winHashMapList" item="winHashMap" index="index" open="" close="" separator=";">
+            update snatch_detail set payout_qty = #{payoutQty},status=2, hash = #{winHashMap.hash}
+            where activity_id = #{snatchActivityId}
+            and `number` = #{winHashMap.number}
+        </foreach>
+    </update>
+
+    <update id="updateWinOne">
+        update snatch_detail set payout_qty = #{payoutQty},status=2, hash = #{hash}, charges_qty = #{chargesQty}
+            where activity_id = #{snatchActivityId}
+            and `number` = #{number}
+    </update>
+
+    <select id="getBettedQty" resultType="java.math.BigDecimal">
+        select IFNULL(SUM(bet_qty),0) from snatch_detail where user_id = #{userId} and activity_id = #{snatchActivityId}
+    </select>
+
+    <select id="getBettedUnits" resultType="integer">
+        select count(*) from snatch_detail where user_id = #{userId} and activity_id = #{snatchActivityId}
+    </select>
+
+    <select id="winSnatchDetails" resultType="com.oax.entity.activity.SnatchDetail">
+        select * from snatch_detail where activity_id = #{activityId} and status = 2
+    </select>
+
+    <select id="listByActivityIdAndNumber" resultType="com.oax.entity.activity.SnatchDetail">
+        select * from snatch_detail where activity_id = #{snatchActivityId} and number in
+        <foreach collection="winNumbers" item="number" index="index" open="(" close=")" separator=",">
+            #{number}
+        </foreach>
+    </select>
+
+    <select id="listVoByUserIdAndActivityId" resultType="com.oax.entity.front.vo.SnatchDetailVo">
+        select * from snatch_detail where user_id = #{userId} and activity_id = #{activityId}
+    </select>
+
+    <select id="listWinVo" resultType="com.oax.entity.front.vo.SnatchDetailVo">
+        SELECT
+        number_str,
+        `hash`,
+        `status`,
+        IF(user_id = #{userId},1,0) as mine
+        FROM
+        snatch_detail
+        WHERE
+        activity_id = #{activityId}
+        AND `status` = 2
+    </select>
+
+    <select id="getPayoutQty" resultType="java.math.BigDecimal">
+        select ifnull(sum(payout_qty),0) from snatch_detail where user_id = #{userId} and activity_id = #{snatchActivityId}
+    </select>
+
+    <select id="getWinCount" resultType="integer">
+        select count(*) from snatch_detail where user_id = #{userId} and activity_id = #{snatchActivityId} and `status` = 2
+    </select>
+
+    <select id="listBetActivityId" resultType="java.lang.Integer">
+      select distinct activity_id from snatch_detail WHERE user_id = #{userId} AND config_id = #{configId} order by activity_id desc
+    </select>
+
+    <select id="listAggregateVoByActivityIds" resultType="com.oax.entity.front.vo.SnatchDetailAggregateVo">
+        SELECT
+        sa.id AS activity_id,
+        sa.ordinal,
+        c.short_name AS coinName,
+        sa.status
+        FROM
+        snatch_activity sa
+        JOIN coin c ON c.id = sa.coin_id
+        WHERE sa.id IN
+        <foreach collection="activityIds" item="activityId" index="index" open="(" close=")" separator=",">
+            #{activityId}
+        </foreach>
+        order by sa.id desc
+    </select>
+
+    <select id="getFirstNumberStr" resultType="java.lang.String">
+        select
+        number_str
+        from
+        snatch_detail
+        where user_id = #{userId} and activity_id = #{activityId}
+        order by id
+        limit 1
+    </select>
+
+    <select id="listRobotNumber" resultType="java.lang.Integer">
+        select `number` from snatch_detail where robot = 1 and activity_id = #{activityId}
+    </select>
+
+    <select id="sumBetQty" resultType="java.math.BigDecimal">
+        select ifnull(sum(bet_qty),0) from snatch_detail where coin_id = #{coinId}
+    </select>
+
+    <select id="sumChargesQty" resultType="java.math.BigDecimal">
+        select ifnull(sum(charges_qty),0) from snatch_detail where coin_id = #{coinId}
+    </select>
+
+    <select id="sumRobotPayout" resultType="java.math.BigDecimal">
+        select ifnull(sum(payout_qty - bet_qty), 0) from snatch_detail where coin_id = #{coinId} and user_id = #{userId} and `status` > 0
+    </select>
+
+</mapper>

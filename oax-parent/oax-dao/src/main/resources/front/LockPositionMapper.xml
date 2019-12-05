@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.LockPositionMapper">
+    <insert id="insert" parameterType="com.oax.entity.front.LockPosition">
+        INSERT INTO oax.lock_position
+        (user_id,coin_id,lock_qty,lock_days,status,create_time)
+        VALUES
+        (#{userId},#{coinId},#{lockQty},#{lockDays},#{status},#{createTime})
+    </insert>
+    <update id="subtractUserCoin" parameterType="com.oax.entity.front.UserCoin">
+        update oax.user_coin set banlance = banlance - #{banlance},freezing_banlance = freezing_banlance + #{banlance}
+        where user_id = #{userId} and coin_id = #{coinId}
+    </update>
+    <update id="addUserCoin" parameterType="com.oax.entity.front.UserCoin">
+        update oax.user_coin set banlance = banlance + #{banlance} ,freezing_banlance = freezing_banlance - #{banlance}
+        where user_id = #{userId} and coin_id = #{coinId}
+    </update>
+    <update id="declock">
+        UPDATE oax.lock_position set status = 1,deblocking_time=now(),deblocking_type = 0 where id = #{id} AND user_id = #{userId}
+    </update>
+    <select id="getPage" resultType="java.util.Map" parameterType="map">
+        SELECT
+            p.id,
+            DATE_FORMAT(p.create_time,'%Y-%m-%d')createTime,
+            p.coin_id coinId,
+            c.short_name coinName,
+            p.lock_days lockDays,
+            truncate(p.lock_qty,8) lockQty,
+            p.status,
+            p.deblocking_type deblockingType,
+            IFNULL(TRUNCATE(SUM(i.qty),8),0) qty
+        from oax.lock_position p
+        LEFT JOIN oax.coin  c  on c.id = p.coin_id
+        LEFT JOIN oax.interest_sharebonus i on i.lock_position_id = p.id
+        <where>
+            p.user_id = #{userId}
+            <if test="coinId!=null">
+                and p.coin_id = #{coinId}
+            </if>
+            <if test="beginTime!=null">
+                and p.create_time >= #{beginTime}
+            </if>
+            <if test="endTime!=null">
+                and #{endTime} >= p.create_time
+            </if>
+        </where>
+        GROUP BY p.id
+        order by p.status,p.id desc
+    </select>
+    <select id="selectLockPositionById" resultType="com.oax.entity.front.LockPosition" parameterType="integer">
+        select id,user_id userId,coin_id coinId,lock_qty lockQty from  oax.lock_position where id = #{id}
+    </select>
+    <update id="sysDeblocking">
+        UPDATE oax.lock_position set status = 1,deblocking_time=now(),deblocking_type = 1 where id = #{id} AND user_id = #{userId}
+    </update>
+    <select id="getLockPositionList" resultType="com.oax.entity.front.LockPositionInfo">
+        SELECT id,user_id userId,coin_id coinId,lock_days lockDays,lock_qty lockQty,(create_time+INTERVAL 1 DAY) createTime
+        from  oax.lock_position where status=0 and #{endTime}> (create_time + INTERVAL 1 DAY)
+    </select>
+    <select id="getInterestSharebonusList" resultType="java.util.Map" parameterType="integer">
+        SELECT
+          i.lock_position_id lockPositionId,
+          i.coin_id coinId,c.short_name coinName,
+          truncate(i.qty,8)qty, DATE_FORMAT(i.create_time,'%Y-%m-%d')createTime
+        from oax.interest_sharebonus i
+        LEFT JOIN oax.coin c on i.coin_id = c.id
+        where i.lock_position_id = #{lockPositionId}
+    </select>
+    <select id="getExpirePositionList" resultType="com.oax.entity.front.LockPosition">
+        select id,user_id userId,coin_id coinId,lock_qty lockQty from  oax.lock_position
+        where status = 0 and #{endTime} >(create_time +interval lock_days DAY)
+    </select>
+</mapper>

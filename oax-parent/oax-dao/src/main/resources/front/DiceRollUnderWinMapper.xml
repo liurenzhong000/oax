@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.activity.DiceRollUnderWinMapper">
+
+    <select id="pageForAdmin" resultType="com.oax.entity.front.vo.DiceRollUnderWinVo">
+        select
+        druw.*,
+        c.short_name as coinName
+        from dice_roll_under_win druw
+        join coin c on druw.coin_id = c.id
+        where 1=1
+        <if test="coinId != null">
+            and druw.coin_id = #{coinId}
+        </if>
+        order by coin_id, min_roll_under
+    </select>
+
+    <select id="selectOpenByCoinIdOrderRollUnder" resultType="com.oax.entity.activity.DiceRollUnderWin">
+        select * from dice_roll_under_win where coin_id = #{coinId} and status = 1 order by min_roll_under
+    </select>
+
+</mapper>

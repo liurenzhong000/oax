@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.UserCoinSnapshootMapper">
+
+    <select id="subordinateSum" resultType="java.math.BigDecimal">
+        SELECT
+        IFNULL(SUM(balanceSum),0)
+        FROM (
+            SELECT
+            AVG(balance + freezing_balance) balanceSum,
+            user_id
+            FROM user_coin_snapshoot
+            WHERE create_time >= #{startTime} AND  #{endTime} >= create_time
+            AND user_id in
+            <foreach collection="userIds" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            GROUP BY user_id
+        ) t
+    </select>
+
+</mapper>

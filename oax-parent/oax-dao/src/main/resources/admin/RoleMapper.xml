@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.admin.RoleMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.admin.Role">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="roleDesc" jdbcType="VARCHAR" property="roledesc"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, roleDesc
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oax_admin.role
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax_admin.role
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.admin.Role">
+        insert into oax_admin.role (id, roleDesc)
+        values (#{id,jdbcType=INTEGER}, #{roledesc,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.admin.Role">
+        insert into oax_admin.role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="roledesc != null">
+                roleDesc,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="roledesc != null">
+                #{roledesc,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.admin.Role">
+        update oax_admin.role
+        <set>
+            <if test="roledesc != null">
+                roleDesc = #{roledesc,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.admin.Role">
+        update oax_admin.role
+        set roleDesc = #{roledesc,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectAll" resultType="com.oax.entity.admin.Role">
+        select
+        id,
+        roleDesc
+        from oax_admin.role
+    </select>
+
+    <select id="selectRoleListWithSelected" resultType="com.oax.entity.admin.Role">
+        SELECT
+        r.id,
+        r.roleDesc,
+        (CASE WHEN (SELECT ur.roleId
+        FROM oax_admin.user_role ur
+        WHERE ur.userId = #{id} AND ur.roleId = r.id)
+        THEN 1
+        ELSE 0 END) AS selected
+        FROM oax_admin.role r
+    </select>
+
+</mapper>

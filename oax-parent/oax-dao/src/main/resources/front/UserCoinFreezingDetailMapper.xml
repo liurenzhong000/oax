@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.UserCoinFreezingDetailMapper">
+    <sql id="Base_Column_List">
+    id, create_time, freezing_time, qty, status, unfreeze_time, update_time, user_id,
+    coin_id, user_name
+  </sql>
+    <select id="selectYesterdayList" resultType="com.oax.entity.front.UserCoinFreezingDetail">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM
+        user_coin_freezing_detail
+        WHERE
+        create_time BETWEEN DATE_FORMAT(date_sub(NOW(),interval 1 day),'%Y-%m-%d 20:00:00')  AND DATE_FORMAT(NOW(),'%Y-%m-%d 20:00:00')
+    </select>
+
+</mapper>

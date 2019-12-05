@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.activity.DiceBetQtyWinMapper">
+
+    <select id="pageForAdmin" resultType="com.oax.entity.front.vo.DiceBetQtyWinVo">
+        select
+        dbqw.*,
+        c.short_name as coinName
+        from dice_bet_qty_win dbqw
+        join coin c on dbqw.coin_id = c.id
+        where 1=1
+        <if test="coinId != null">
+            and dbqw.coin_id = #{coinId}
+        </if>
+        order by coin_id, min_bet_qty
+    </select>
+
+    <select id="selectOpenByCoinIdOrderBetQty" resultType="com.oax.entity.activity.DiceBetQtyWin">
+        select * from dice_bet_qty_win where coin_id = #{coinId} and status = 1 order by min_bet_qty
+    </select>
+
+</mapper>

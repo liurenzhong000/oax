@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.activity.SnatchConfigMapper">
+
+    <select id="listConfigCoin" resultType="com.oax.entity.front.vo.SnatchCoinVo">
+        SELECT
+        DISTINCT coin_id,
+        c.short_name AS coinName
+        FROM
+        snatch_config sc
+        JOIN coin c ON sc.coin_id = c.id
+        where sc.status = 1
+        ORDER BY sequence
+    </select>
+
+    <select id="listAllConfigCoin" resultType="com.oax.entity.front.vo.SnatchCoinVo">
+        SELECT
+        DISTINCT coin_id,
+        c.short_name AS coinName
+        FROM
+        snatch_config sc
+        JOIN coin c ON sc.coin_id = c.id
+        ORDER BY sequence
+    </select>
+
+    <select id="listNoActivity" resultType="com.oax.entity.activity.SnatchConfig">
+        SELECT
+        sc.*
+        FROM
+        snatch_config sc
+        LEFT JOIN snatch_activity sa ON sa.config_id = sc.id AND sa.status=0
+        WHERE sa.id IS NULL
+        AND sc.status = 1
+    </select>
+
+    <select id="defaultCoinId" resultType="java.lang.Integer">
+        SELECT
+        coin_id
+        from
+        snatch_config
+        where `status` = 1
+        ORDER BY sequence
+        limit 1
+    </select>
+
+    <select id="listConfigTypeByCoinId" resultType="com.oax.entity.front.vo.SnatchConfigTypeVo">
+        select id, `name` from snatch_config where coin_id = #{coinId} order by quantity
+    </select>
+
+    <select id="pageForAdmin" resultType="com.oax.entity.admin.vo.SnatchConfigVo">
+        select
+        sc.*,
+        c.short_name as coinName
+        from
+        snatch_config sc
+        join coin c on c.id =sc.coin_id
+        where 1=1
+        <if test="coinId != null">and sc.coin_id = #{coinId}</if>
+    </select>
+
+
+</mapper>

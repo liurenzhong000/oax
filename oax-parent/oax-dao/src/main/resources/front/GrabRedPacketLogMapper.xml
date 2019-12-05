@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.GrabRedPacketLogMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.GrabRedPacketLog">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="red_packet_id" jdbcType="INTEGER" property="redPacketId" />
+        <result column="coin_id" jdbcType="INTEGER" property="coinId" />
+        <result column="coin_name" jdbcType="VARCHAR" property="coinName" />
+        <result column="coin_qty" jdbcType="DECIMAL" property="coinQty" />
+        <result column="cny" jdbcType="DECIMAL" property="cny" />
+        <result column="sources" jdbcType="VARCHAR" property="sources" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, red_packet_id, coin_id, coin_name, coin_qty, cny, sources, create_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from oax.grab_red_packet_log
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.grab_red_packet_log
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.GrabRedPacketLog">
+        insert into oax.grab_red_packet_log (id, user_id, red_packet_id,
+                                         coin_id, coin_name, coin_qty,
+                                         cny, sources, create_time
+        )
+        values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{redPacketId,jdbcType=INTEGER},
+                #{coinId,jdbcType=INTEGER}, #{coinName,jdbcType=VARCHAR}, #{coinQty,jdbcType=DECIMAL},
+                #{cny,jdbcType=DECIMAL}, #{sources,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.GrabRedPacketLog">
+        insert into oax.grab_red_packet_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="redPacketId != null">
+                red_packet_id,
+            </if>
+            <if test="coinId != null">
+                coin_id,
+            </if>
+            <if test="coinName != null">
+                coin_name,
+            </if>
+            <if test="coinQty != null">
+                coin_qty,
+            </if>
+            <if test="cny != null">
+                cny,
+            </if>
+            <if test="sources != null">
+                sources,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="redPacketId != null">
+                #{redPacketId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="coinName != null">
+                #{coinName,jdbcType=VARCHAR},
+            </if>
+            <if test="coinQty != null">
+                #{coinQty,jdbcType=DECIMAL},
+            </if>
+            <if test="cny != null">
+                #{cny,jdbcType=DECIMAL},
+            </if>
+            <if test="sources != null">
+                #{sources,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.GrabRedPacketLog">
+        update oax.grab_red_packet_log
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="redPacketId != null">
+                red_packet_id = #{redPacketId,jdbcType=INTEGER},
+            </if>
+            <if test="coinId != null">
+                coin_id = #{coinId,jdbcType=INTEGER},
+            </if>
+            <if test="coinName != null">
+                coin_name = #{coinName,jdbcType=VARCHAR},
+            </if>
+            <if test="coinQty != null">
+                coin_qty = #{coinQty,jdbcType=DECIMAL},
+            </if>
+            <if test="cny != null">
+                cny = #{cny,jdbcType=DECIMAL},
+            </if>
+            <if test="sources != null">
+                sources = #{sources,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.GrabRedPacketLog">
+        update oax.grab_red_packet_log
+        set user_id = #{userId,jdbcType=INTEGER},
+            red_packet_id = #{redPacketId,jdbcType=INTEGER},
+            coin_id = #{coinId,jdbcType=INTEGER},
+            coin_name = #{coinName,jdbcType=VARCHAR},
+            coin_qty = #{coinQty,jdbcType=DECIMAL},
+            cny = #{cny,jdbcType=DECIMAL},
+            sources = #{sources,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectByPacketId" resultType="com.oax.entity.front.GrabRedPacketLog">
+        select
+            grpl.*,
+            u.email `email`,
+            u.phone `phone`
+        from oax.grab_red_packet_log grpl
+        left join oax.user u on u.id = grpl.user_id
+        where grpl.red_packet_id = #{packetId}
+    </select>
+    <select id="selectPageByUserId" resultType="com.oax.entity.front.GrabRedPacketLog">
+
+        select
+            grpl.*,
+            u.email `email`,
+            u.phone `phone`
+        from oax.grab_red_packet_log grpl
+            left join oax.user u on u.id = grpl.user_id
+        where grpl.user_id = #{userId}
+
+    </select>
+
+</mapper>

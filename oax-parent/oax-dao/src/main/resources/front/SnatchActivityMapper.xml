@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.activity.SnatchActivityMapper">
+
+    <select id="listActivityByCoinId" resultType="com.oax.entity.front.vo.SnatchActivityVo">
+        SELECT
+        sa.id,
+        sa.config_id,
+        sa.config_name,
+        sa.id,
+        sa.ordinal,
+        sa.coin_id,
+        sa.finish_quantity,
+        sa.quantity,
+        sa.max_quantity,
+        sa.unit,
+        sa.win_number,
+        c.short_name AS coinName
+        FROM
+        snatch_activity sa
+        JOIN coin c ON sa.coin_id = c.id
+        JOIN snatch_config sc ON sc.id = sa.config_id
+        WHERE sa.`status` = 0 and sa.coin_id = #{coinId}
+        ORDER BY sc.sequence
+    </select>
+
+    <select id="listNewlyLottery" resultType="com.oax.entity.front.vo.SnatchActivityVo">
+        SELECT
+        *
+        FROM
+        snatch_activity
+        WHERE STATUS = 1
+        ORDER BY lottery_time DESC
+        LIMIT 5
+    </select>
+
+    <select id="pageForAdmin" resultType="com.oax.entity.admin.vo.SnatchActivityAdminVo">
+        select
+        sa.*,
+        c.short_name as coinName
+        from
+        snatch_activity sa
+        join coin c on sa.coin_id = c.id
+        where 1=1
+        <if test="id != null">and sa.id = #{id}</if>
+        <if test="coinId != null">and sa.coin_id = #{coinId}</if>
+        <if test="configId != null">and sa.config_id = #{configId}</if>
+        order by status desc
+    </select>
+
+</mapper>

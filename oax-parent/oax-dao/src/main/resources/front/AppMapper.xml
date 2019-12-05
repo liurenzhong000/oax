@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.AppMapper">
+    <resultMap id="BaseResultMap" type="com.oax.entity.front.App">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="version" jdbcType="VARCHAR" property="version"/>
+        <result column="download_url" jdbcType="VARCHAR" property="downloadUrl"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="admin_id" jdbcType="INTEGER" property="adminId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.oax.entity.front.App">
+        <result column="description" jdbcType="LONGVARCHAR" property="description"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, type, version, download_url, status, admin_id, create_time, update_time
+    </sql>
+    <sql id="Blob_Column_List">
+        description
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax.app
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from oax.app
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.oax.entity.front.App">
+        insert into oax.app (id, type, version,
+        download_url, status, admin_id,
+        create_time, update_time, description
+        )
+        values (#{id,jdbcType=INTEGER}, #{type,jdbcType=TINYINT}, #{version,jdbcType=VARCHAR},
+        #{downloadUrl,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{adminId,jdbcType=INTEGER},
+        #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.oax.entity.front.App">
+        insert into oax.app
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="version != null">
+                version,
+            </if>
+            <if test="downloadUrl != null">
+                download_url,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="adminId != null">
+                admin_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=TINYINT},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="downloadUrl != null">
+                #{downloadUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="adminId != null">
+                #{adminId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.App">
+        update oax.app
+        <set>
+            <if test="type != null">
+                type = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="version != null">
+                version = #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="downloadUrl != null">
+                download_url = #{downloadUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="adminId != null">
+                admin_id = #{adminId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.oax.entity.front.App">
+        update oax.app
+        set type = #{type,jdbcType=TINYINT},
+        version = #{version,jdbcType=VARCHAR},
+        download_url = #{downloadUrl,jdbcType=VARCHAR},
+        status = #{status,jdbcType=TINYINT},
+        admin_id = #{adminId,jdbcType=INTEGER},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        description = #{description,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.App">
+        update oax.app
+        set type = #{type,jdbcType=TINYINT},
+        version = #{version,jdbcType=VARCHAR},
+        download_url = #{downloadUrl,jdbcType=VARCHAR},
+        status = #{status,jdbcType=TINYINT},
+        admin_id = #{adminId,jdbcType=INTEGER},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="selectByAppPageParam" resultType="com.oax.entity.front.App">
+
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from oax.app
+        <where>
+            <if test="appType!=null">
+                and type = #{appType}
+            </if>
+            <if test="version!=null">
+                and version like concat('%',#{version},'%')
+            </if>
+            <if test="startTime!=null and endTime!=null">
+                and create_time between #{startTime} and #{endTime}
+            </if>
+
+            order by
+            update_time desc
+        </where>
+    </select>
+
+    <select id="checkVersion" parameterType="int" resultType="com.oax.entity.front.App">
+        select version, download_url downloadUrl
+        from oax.app where type =#{type} and status = 1 ORDER BY create_time desc limit 1
+    </select>
+    <select id="getLastVersionUrl" parameterType="int" resultType="string">
+        select download_url 
+        from oax.app where type =#{type} and status = 1 ORDER BY create_time desc limit 1
+    </select>
+</mapper>

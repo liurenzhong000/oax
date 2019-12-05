@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.BonusLogMapper">
+
+    <select id="selectVoForExcel" resultType="com.oax.entity.admin.vo.BonusLogVo">
+        SELECT
+        user_id AS userId,
+        u.phone AS phone,
+        u.email AS email,
+        u.id_name AS idName,
+        curr_qty AS currQty,
+        bonus AS bonus,
+        my_bonus AS myBonus,
+        one_count AS oneCount,
+        one_bonus AS oneBonus,
+        two_count AS twoCount,
+        two_bonus AS twoBonus,
+        three_count AS threeCount,
+        three_bonus AS threeBonus,
+        one_user_ids AS oneUserIds,
+        two_user_ids AS twoUserIds,
+        three_user_ids AS threeUserIds,
+        bl.create_time
+        FROM
+        bonus_log bl
+        JOIN `user` u ON bl.user_id = u.id
+        AND create_time >= #{startTime} AND #{endTime} >= create_time
+        ORDER BY bonus DESC
+    </select>
+
+    <select id="selectEmployeeForExcel" resultType="com.oax.entity.admin.vo.BonusLogVo">
+        SELECT
+        user_id AS userId,
+        u.phone AS phone,
+        u.email AS email,
+        u.id_name AS idName,
+        curr_qty AS currQty,
+        bonus AS bonus,
+        my_bonus AS myBonus,
+        one_count AS oneCount,
+        one_bonus AS oneBonus,
+        two_count AS twoCount,
+        two_bonus AS twoBonus,
+        three_count AS threeCount,
+        three_bonus AS threeBonus,
+        one_user_ids AS oneUserIds,
+        two_user_ids AS twoUserIds,
+        three_user_ids AS threeUserIds,
+        bl.create_time
+        FROM
+        bonus_log bl
+        JOIN `user` u ON bl.user_id = u.id
+        AND create_time >= #{startTime} AND #{endTime} >= create_time
+        AND u.id IN (242900,242878,242907,243172,242929,242880,242957,242655,243182,243184,242914,93678,242831,242898,242908,242905,242881,242882,242813,242777,242811,242802,243096,242803,243104,242920,243264)
+        ORDER BY bonus DESC
+    </select>
+
+    <select id="getBonusLogMapper" resultType="java.math.BigDecimal">
+        SELECT
+        ifnull(sum(bonus),0)
+        FROM
+        bonus_log bl
+        JOIN `user` u ON bl.user_id = u.id
+        AND create_time >= #{startTime} AND #{endTime} >= create_time
+        AND u.id IN (242900,242878,242907,243172,242929,242880,242957,242655,243182,243184,242914,93678,242831,242898,242908,242905,242881,242882,242813,242777,242811,242802,243096,242803,243104,242920,243264)
+    </select>
+
+</mapper>

@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oax.mapper.front.MovesayMoneyActiveMapper">
+  <resultMap id="BaseResultMap" type="com.oax.entity.front.MovesayMoneyActive">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="date" jdbcType="INTEGER" property="date" />
+    <result column="profits" jdbcType="INTEGER" property="profits" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="join_num" jdbcType="INTEGER" property="joinNum" />
+    <result column="join_money" jdbcType="DECIMAL" property="joinMoney" />
+    <result column="market_id" jdbcType="INTEGER" property="marketId" />
+    <result column="money" jdbcType="DECIMAL" property="money" />
+    <result column="limit_max" jdbcType="DECIMAL" property="limitMax" />
+    <result column="limit_min" jdbcType="DECIMAL" property="limitMin" />
+    <result column="recommend" jdbcType="TINYINT" property="recommend" />
+    <result column="display_open" jdbcType="TINYINT" property="displayOpen" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="interstart_time" jdbcType="TIMESTAMP" property="interstartTime" />
+    <result column="interend_time" jdbcType="TIMESTAMP" property="interendTime" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="deposit_money" jdbcType="DECIMAL" property="depositMoney" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, title, date, profits, status, join_num, join_money, market_id, money, limit_max, 
+    limit_min, recommend, display_open, create_time, update_time, start_time, end_time, 
+    interstart_time, interend_time, type, deposit_money
+  </sql>
+  <select id="selectByExample" parameterType="com.oax.entity.front.MovesayMoneyActiveExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from movesay_money_active
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from movesay_money_active
+    where id = #{id,jdbcType=INTEGER} for update
+  </select>
+  <select id="selectActive" resultType="com.oax.entity.front.Active">
+    select
+    id,title
+    from movesay_money_active
+  </select>
+   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from movesay_money_active
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.oax.entity.front.MovesayMoneyActiveExample">
+    delete from movesay_money_active
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.oax.entity.front.MovesayMoneyActive">
+    insert into movesay_money_active (id, title, date, 
+      profits, status, join_num, 
+      join_money, market_id, money, 
+      limit_max, limit_min, recommend, 
+      display_open, create_time, update_time, 
+      start_time, end_time, interstart_time, 
+      interend_time, type, deposit_money
+      )
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{date,jdbcType=INTEGER}, 
+      #{profits,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{joinNum,jdbcType=INTEGER}, 
+      #{joinMoney,jdbcType=DECIMAL}, #{marketId,jdbcType=INTEGER}, #{money,jdbcType=DECIMAL}, 
+      #{limitMax,jdbcType=DECIMAL}, #{limitMin,jdbcType=DECIMAL}, #{recommend,jdbcType=TINYINT}, 
+      #{displayOpen,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{interstartTime,jdbcType=TIMESTAMP}, 
+      #{interendTime,jdbcType=TIMESTAMP}, #{type,jdbcType=INTEGER}, #{depositMoney,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.oax.entity.front.MovesayMoneyActive">
+    insert into movesay_money_active
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="date != null">
+        date,
+      </if>
+      <if test="profits != null">
+        profits,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="joinNum != null">
+        join_num,
+      </if>
+      <if test="joinMoney != null">
+        join_money,
+      </if>
+      <if test="marketId != null">
+        market_id,
+      </if>
+      <if test="money != null">
+        money,
+      </if>
+      <if test="limitMax != null">
+        limit_max,
+      </if>
+      <if test="limitMin != null">
+        limit_min,
+      </if>
+      <if test="recommend != null">
+        recommend,
+      </if>
+      <if test="displayOpen != null">
+        display_open,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="interstartTime != null">
+        interstart_time,
+      </if>
+      <if test="interendTime != null">
+        interend_time,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="depositMoney != null">
+        deposit_money,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=INTEGER},
+      </if>
+      <if test="profits != null">
+        #{profits,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="joinNum != null">
+        #{joinNum,jdbcType=INTEGER},
+      </if>
+      <if test="joinMoney != null">
+        #{joinMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="marketId != null">
+        #{marketId,jdbcType=INTEGER},
+      </if>
+      <if test="money != null">
+        #{money,jdbcType=DECIMAL},
+      </if>
+      <if test="limitMax != null">
+        #{limitMax,jdbcType=DECIMAL},
+      </if>
+      <if test="limitMin != null">
+        #{limitMin,jdbcType=DECIMAL},
+      </if>
+      <if test="recommend != null">
+        #{recommend,jdbcType=TINYINT},
+      </if>
+      <if test="displayOpen != null">
+        #{displayOpen,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="interstartTime != null">
+        #{interstartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="interendTime != null">
+        #{interendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="depositMoney != null">
+        #{depositMoney,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.oax.entity.front.MovesayMoneyActiveExample" resultType="java.lang.Long">
+    select count(*) from movesay_money_active
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update movesay_money_active
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.title != null">
+        title = #{record.title,jdbcType=VARCHAR},
+      </if>
+      <if test="record.date != null">
+        date = #{record.date,jdbcType=INTEGER},
+      </if>
+      <if test="record.profits != null">
+        profits = #{record.profits,jdbcType=INTEGER},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=INTEGER},
+      </if>
+      <if test="record.joinNum != null">
+        join_num = #{record.joinNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.joinMoney != null">
+        join_money = #{record.joinMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="record.marketId != null">
+        market_id = #{record.marketId,jdbcType=INTEGER},
+      </if>
+      <if test="record.money != null">
+        money = #{record.money,jdbcType=DECIMAL},
+      </if>
+      <if test="record.limitMax != null">
+        limit_max = #{record.limitMax,jdbcType=DECIMAL},
+      </if>
+      <if test="record.limitMin != null">
+        limit_min = #{record.limitMin,jdbcType=DECIMAL},
+      </if>
+      <if test="record.recommend != null">
+        recommend = #{record.recommend,jdbcType=TINYINT},
+      </if>
+      <if test="record.displayOpen != null">
+        display_open = #{record.displayOpen,jdbcType=TINYINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.startTime != null">
+        start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.endTime != null">
+        end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.interstartTime != null">
+        interstart_time = #{record.interstartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.interendTime != null">
+        interend_time = #{record.interendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.type != null">
+        type = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.depositMoney != null">
+        deposit_money = #{record.depositMoney,jdbcType=DECIMAL},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update movesay_money_active
+    set id = #{record.id,jdbcType=INTEGER},
+      title = #{record.title,jdbcType=VARCHAR},
+      date = #{record.date,jdbcType=INTEGER},
+      profits = #{record.profits,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
+      join_num = #{record.joinNum,jdbcType=INTEGER},
+      join_money = #{record.joinMoney,jdbcType=DECIMAL},
+      market_id = #{record.marketId,jdbcType=INTEGER},
+      money = #{record.money,jdbcType=DECIMAL},
+      limit_max = #{record.limitMax,jdbcType=DECIMAL},
+      limit_min = #{record.limitMin,jdbcType=DECIMAL},
+      recommend = #{record.recommend,jdbcType=TINYINT},
+      display_open = #{record.displayOpen,jdbcType=TINYINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      start_time = #{record.startTime,jdbcType=TIMESTAMP},
+      end_time = #{record.endTime,jdbcType=TIMESTAMP},
+      interstart_time = #{record.interstartTime,jdbcType=TIMESTAMP},
+      interend_time = #{record.interendTime,jdbcType=TIMESTAMP},
+      type = #{record.type,jdbcType=INTEGER},
+      deposit_money = #{record.depositMoney,jdbcType=DECIMAL}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.oax.entity.front.MovesayMoneyActive">
+    update movesay_money_active
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null">
+        date = #{date,jdbcType=INTEGER},
+      </if>
+      <if test="profits != null">
+        profits = #{profits,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="joinNum != null">
+        join_num = #{joinNum,jdbcType=INTEGER},
+      </if>
+      <if test="joinMoney != null">
+        join_money = #{joinMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="marketId != null">
+        market_id = #{marketId,jdbcType=INTEGER},
+      </if>
+      <if test="money != null">
+        money = #{money,jdbcType=DECIMAL},
+      </if>
+      <if test="limitMax != null">
+        limit_max = #{limitMax,jdbcType=DECIMAL},
+      </if>
+      <if test="limitMin != null">
+        limit_min = #{limitMin,jdbcType=DECIMAL},
+      </if>
+      <if test="recommend != null">
+        recommend = #{recommend,jdbcType=TINYINT},
+      </if>
+      <if test="displayOpen != null">
+        display_open = #{displayOpen,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="interstartTime != null">
+        interstart_time = #{interstartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="interendTime != null">
+        interend_time = #{interendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="depositMoney != null">
+        deposit_money = #{depositMoney,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.oax.entity.front.MovesayMoneyActive">
+    update movesay_money_active
+    set title = #{title,jdbcType=VARCHAR},
+      date = #{date,jdbcType=INTEGER},
+      profits = #{profits,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      join_num = #{joinNum,jdbcType=INTEGER},
+      join_money = #{joinMoney,jdbcType=DECIMAL},
+      market_id = #{marketId,jdbcType=INTEGER},
+      money = #{money,jdbcType=DECIMAL},
+      limit_max = #{limitMax,jdbcType=DECIMAL},
+      limit_min = #{limitMin,jdbcType=DECIMAL},
+      recommend = #{recommend,jdbcType=TINYINT},
+      display_open = #{displayOpen,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      interstart_time = #{interstartTime,jdbcType=TIMESTAMP},
+      interend_time = #{interendTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=INTEGER},
+      deposit_money = #{depositMoney,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateStatus" parameterType="java.lang.Integer">
+     update movesay_money_active
+     set status = #{status,jdbcType=INTEGER}
+     where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateJoinDetail">
+    update movesay_money_active
+     set join_num= #{joinNum,jdbcType=INTEGER},
+          join_money=#{joinMoney,jdbcType=DECIMAL}
+     where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
